@@ -1,0 +1,563 @@
+/* =====================================================
+   PANTALLA DE REGISTRO  (CSS simple: px, vh, vw)
+   Para cambiar un tamaño, solo cambia el número.
+   ===================================================== */
+
+/* ---------- Pantalla completa con la foto de fondo ----------
+   Si tienes una foto distinta para el registro, cambia el nombre del archivo. */
+.pantalla-registro {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end;
+    /* la tarjeta va a la derecha */
+    align-items: center;
+    padding: 0 4vw;
+    color: white;
+    background: #0f2f33 url('/imagenes/fondo-inicio.jpeg') center / cover;
+}
+
+/* ---------- Marca (arriba a la izquierda). Al tocarla lleva al inicio ---------- */
+.marca {
+    position: absolute;
+    top: 18px;
+    left: 24px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.marca-logo {
+    height: 70px;
+}
+
+.marca-linea {
+    width: 3px;
+    height: 56px;
+    background-color: var(--color-principal);
+}
+
+.marca-nombre {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+/* ---------- Mensaje institucional (izquierda) ---------- */
+.presentacion {
+    position: absolute;
+    top: 27vh;
+    /* qué tan abajo empieza */
+    left: 4.5vw;
+}
+
+.presentacion-titulo {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.15;
+}
+
+.presentacion-linea {
+    display: block;
+    width: 70px;
+    height: 4px;
+    margin: 16px 0;
+    background-color: var(--color-principal);
+}
+
+.presentacion-texto {
+    max-width: 400px;
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+/* ---------- Mascota: pegada abajo, junto a la tarjeta ---------- */
+.mascota-registro {
+    position: absolute;
+    bottom: 0;
+    right: 42vw;
+    /* más grande = más a la izquierda */
+    height: 64vh;
+    /* tamaño de la mascota */
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ---------- Tarjeta de registro ---------- */
+.caja-registro {
+    position: relative;
+    z-index: 2;
+    /* por encima de la mascota */
+    width: 480px;
+    /* ancho de la tarjeta */
+    max-height: 96vh;
+    overflow-y: auto;
+    /* solo aparece si la pantalla es muy baja */
+    padding: 28px 38px;
+    border-radius: 28px;
+    background-color: white;
+    color: var(--color-texto);
+}
+
+.caja-titulo {
+    margin: 0 0 6px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--color-oscuro);
+}
+
+.caja-subtitulo {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #6f7f7b;
+}
+
+/* ---------- Campos ---------- */
+.bloque {
+    margin-bottom: 12px;
+}
+
+.bloque label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Dos campos lado a lado */
+.fila-dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.campo-icono {
+    position: relative;
+}
+
+.campo {
+    width: 100%;
+    height: 46px;
+    /* alto de los campos */
+    padding: 0 14px 0 42px;
+    /* el espacio de la izquierda es para el icono */
+    border: 1px solid #dfece6;
+    border-radius: 12px;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.campo::placeholder {
+    color: var(--color-marcador);
+}
+
+.campo:focus-visible {
+    outline: 2px solid var(--color-principal);
+}
+
+.campo-con-ojo {
+    padding-right: 42px;
+    /* espacio para el ojo */
+}
+
+.campo-select {
+    appearance: none;
+    /* quita la flecha del navegador */
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+/* Iconos */
+.icono {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.icono-izq {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    color: var(--color-icono-candado);
+    pointer-events: none;
+}
+
+.icono-der {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    color: var(--color-icono-ojo);
+    pointer-events: none;
+}
+
+.ver-clave {
+    position: absolute;
+    right: 12px;
+    top: 14px;
+    display: flex;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-icono-ojo);
+    cursor: pointer;
+}
+
+/* ---------- Política, botón y pie ---------- */
+.politica {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 14px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.politica input {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--color-principal);
+}
+
+.enlace {
+    font-weight: 700;
+    color: var(--color-icono-candado);
+    text-decoration: none;
+}
+
+.boton-registrar {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 30px;
+    border: none;
+    border-radius: 999px;
+    background-color: var(--color-principal);
+    color: var(--color-oscuro);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.boton-registrar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pie-caja {
+    margin: 14px 0 0;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+/* Mensajes */
+.aviso-error,
+.aviso-exito {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background-color: white;
+    font-size: 14px;
+}
+
+.aviso-error {
+    border: 1px solid var(--color-error);
+    color: var(--color-error);
+}
+
+.aviso-exito {
+    border: 1px solid var(--color-icono-candado);
+    color: var(--color-icono-candado);
+}
+
+/* Popup de registro exitoso */
+.modal-fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal-caja {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px 40px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.modal-icono {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: #2fdc8c;
+    color: #0b2a1d;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-titulo {
+    margin: 0 0 8px;
+    font-size: 24px;
+    color: #111;
+}
+
+.modal-texto {
+    margin: 0 0 20px;
+    color: #555;
+}
+
+.modal-boton {
+    display: inline-block;
+    background: #2fdc8c;
+    color: #0b2a1d;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 12px 28px;
+    text-decoration: none;
+}
+
+
+
+/* =====================================================
+   LAPTOPS (hasta 1400 px de ancho): todo un poco más pequeño
+   ===================================================== */
+@media (max-width: 1400px) {
+    .marca-logo {
+        height: 56px;
+    }
+
+    .marca-linea {
+        height: 44px;
+    }
+
+    .marca-nombre {
+        font-size: 14px;
+    }
+
+    .presentacion-titulo {
+        font-size: 32px;
+    }
+
+    .presentacion-texto {
+        max-width: 320px;
+        font-size: 15px;
+    }
+
+    .mascota-registro {
+        height: 58vh;
+    }
+
+    .caja-registro {
+        width: 420px;
+        padding: 22px 30px;
+    }
+
+    .caja-titulo {
+        font-size: 26px;
+    }
+
+    .caja-subtitulo {
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    .bloque {
+        margin-bottom: 10px;
+    }
+
+    .bloque label {
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .campo {
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .icono-izq,
+    .icono-der,
+    .ver-clave {
+        top: 11px;
+    }
+
+    .politica {
+        font-size: 12px;
+    }
+
+    .boton-registrar {
+        height: 42px;
+        font-size: 15px;
+    }
+
+    .pie-caja {
+        margin-top: 10px;
+        font-size: 12px;
+    }
+}
+
+/* =====================================================
+   PANTALLAS BAJAS (poca altura): la tarjeta se compacta para que
+   todo el formulario se vea completo, sin hacer scroll.
+   ===================================================== */
+@media (max-height: 780px) {
+    .caja-registro {
+        padding: 18px 28px;
+    }
+
+    .caja-titulo {
+        margin-bottom: 4px;
+        font-size: 24px;
+    }
+
+    .caja-subtitulo {
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+
+    .bloque {
+        margin-bottom: 8px;
+    }
+
+    .bloque label {
+        margin-bottom: 3px;
+        font-size: 11.5px;
+    }
+
+    .campo {
+        height: 36px;
+        font-size: 12.5px;
+    }
+
+    .icono-izq,
+    .icono-der,
+    .ver-clave {
+        top: 9px;
+    }
+
+    .politica {
+        margin: 2px 0 10px;
+        font-size: 11.5px;
+    }
+
+    .boton-registrar {
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .pie-caja {
+        margin-top: 8px;
+        font-size: 11.5px;
+    }
+}
+
+@media (max-height: 680px) {
+    .caja-registro {
+        padding: 14px 26px;
+    }
+
+    .caja-titulo {
+        font-size: 22px;
+    }
+
+    .caja-subtitulo {
+        margin-bottom: 6px;
+    }
+
+    .bloque {
+        margin-bottom: 6px;
+    }
+
+    .campo {
+        height: 33px;
+    }
+
+    .icono-izq,
+    .icono-der,
+    .ver-clave {
+        top: 7.5px;
+    }
+
+    .politica {
+        margin-bottom: 8px;
+    }
+
+    .boton-registrar {
+        height: 36px;
+    }
+}
+
+/* =====================================================
+   TABLET Y CELULAR (hasta 900 px): una sola columna, sin mascota
+   (aquí sí se puede bajar la pantalla)
+   ===================================================== */
+@media (max-width: 900px) {
+    .pantalla-registro {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 20px;
+        padding: 16px 20px 32px;
+    }
+
+    .marca {
+        position: static;
+    }
+
+    .presentacion,
+    .mascota-registro {
+        display: none;
+    }
+
+    .caja-registro {
+        width: 100%;
+        max-width: 480px;
+        max-height: none;
+        margin: 0 auto;
+        padding: 24px;
+    }
+}
+
+/* Celulares: los pares de campos pasan a una sola columna */
+@media (max-width: 600px) {
+    .fila-dos {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

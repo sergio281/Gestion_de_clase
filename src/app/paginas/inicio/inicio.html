@@ -1,0 +1,79 @@
+<main class="pantalla">
+
+    <!-- Encabezado: marca a la izquierda, Registro a la derecha -->
+    <header class="encabezado">
+        <div class="marca">
+            <img class="marca-logo" src="imagenes/logo-universidad.png" alt="Escudo de la Universidad de Caldas">
+            <span class="marca-linea"></span>
+            <span class="marca-nombre">Universidad<br>de Caldas</span>
+        </div>
+        <a class="registro" routerLink="/registro">Registro</a>
+    </header>
+
+    <!-- Centro: titular a la izquierda y tarjeta a la derecha -->
+    <section class="centro">
+        <h1 class="titulo-inicio">
+            <span>Salones y equipos</span>
+            <span>de la sede Guarinó,</span>
+            <span>sin cruces de</span>
+            <span class="titulo-verde">horario.</span>
+        </h1>
+
+        <div class="caja-ingreso">
+            <h2 class="caja-titulo">Iniciar sesión</h2>
+
+            <form class="formulario" [formGroup]="formularioIngreso" (ngSubmit)="enviarDatosFormulario()">
+                <label for="correo">Correo institucional</label>
+                <input id="correo" class="campo" type="email" formControlName="correo"
+                    placeholder="usuario@ucaldas.edu.co" autocomplete="username">
+
+                <label for="clave">Contraseña</label>
+                <div class="campo-clave">
+                    <svg class="icono-clave" viewBox="0 0 11 12" aria-hidden="true">
+                        <rect x="0.75" y="5" width="9.5" height="6.25" rx="1.5" fill="none" stroke="currentColor"
+                            stroke-width="1.2" />
+                        <path d="M2.75 5V3.5a2.75 2.75 0 0 1 5.5 0V5" fill="none" stroke="currentColor"
+                            stroke-width="1.2" />
+                    </svg>
+
+                    <input id="clave" class="campo" [type]="claveVisible() ? 'text' : 'password'"
+                        formControlName="clave" placeholder="Mínimo 8 caracteres" autocomplete="current-password">
+
+                    <button type="button" class="ver-clave" (click)="alternarVisibilidadClave()"
+                        [attr.aria-label]="claveVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                        <svg viewBox="0 0 11 8" aria-hidden="true">
+                            <path d="M0.6 4C1.6 2 3.4 0.8 5.5 0.8S9.4 2 10.4 4c-1 2-2.8 3.2-4.9 3.2S1.6 6 0.6 4z"
+                                fill="none" stroke="currentColor" stroke-width="1.1" />
+                            @if (claveVisible()) {
+                            <path d="M1.5 7.5L9.5 0.5" stroke="currentColor" stroke-width="1.1"
+                                stroke-linecap="round" />
+                            } @else {
+                            <circle cx="5.5" cy="4" r="1.3" fill="currentColor" />
+                            }
+                        </svg>
+                    </button>
+                </div>
+
+                @if (mensajeError()) {
+                <div class="aviso-error" role="alert">{{ mensajeError() }}</div>
+                }
+
+                <button type="submit" class="entrar" [disabled]="cargando()">
+                    {{ cargando() ? 'Ingresando...' : 'Entrar →' }}
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Descripción inferior -->
+    <footer class="pie-texto">
+        <span class="pie-linea"></span>
+        <p>
+            Consulta la ocupación de los salones, solicita el tuyo dentro de la franja oficial<br>
+            de tu programa y pide equipos de préstamo con anticipación.
+        </p>
+    </footer>
+
+    <!-- Mascota -->
+    <img class="mascota-inicio" src="imagenes/mascota.png" alt="Mascota de la Universidad de Caldas">
+</main>
