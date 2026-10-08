@@ -1,0 +1,7 @@
+<main style="padding: 24px">
+    <h1>Panel administrativo</h1>
+    @if (perfil(); as p) {
+    <p>Bienvenido, {{ p.nombre }} ({{ p.rol }})</p>
+    }
+    <button type="button" (click)="salir()">Cerrar sesión</button>
+</main>

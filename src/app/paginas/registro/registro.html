@@ -1,0 +1,179 @@
+<!-- Registro-->
+<main class="pantalla-registro">
+
+    <!-- Marca de la universidad -->
+    <a class="marca" routerLink="/inicio" aria-label="Ir al inicio">
+        <img class="marca-logo" src="imagenes/logo-universidad.png" alt="Escudo de la Universidad de Caldas">
+        <span class="marca-linea"></span>
+        <span class="marca-nombre">Universidad<br>de Caldas</span>
+    </a>
+
+    <!-- Mensaje institucional -->
+    <section class="presentacion">
+        <h2 class="presentacion-titulo">Conocimiento que<br>transforma vidas</h2>
+        <span class="presentacion-linea"></span>
+        <p class="presentacion-texto">
+            Haz parte de una comunidad pública, diversa y comprometida con el futuro de nuestra región.
+        </p>
+    </section>
+
+    <!-- Mascota -->
+    <img class="mascota-registro" src="imagenes/mascota.png" alt="Mascota de la Universidad de Caldas">
+
+    <!-- Tarjeta de registro (siempre visible) -->
+    <section class="caja-registro">
+        <h1 class="caja-titulo">Crear cuenta</h1>
+        <p class="caja-subtitulo">Regístrate para acceder a los servicios digitales de la Universidad.</p>
+
+        <form [formGroup]="formularioRegistro" (ngSubmit)="enviarDatosFormulario()">
+
+            <!-- Nombre completo -->
+            <div class="bloque">
+                <label for="nombreCompleto">Nombre completo</label>
+                <div class="campo-icono">
+                    <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+                    </svg>
+                    <input id="nombreCompleto" class="campo" formControlName="nombreCompleto"
+                        placeholder="Tu nombre completo" autocomplete="name">
+                </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="bloque">
+                <label for="correo">Correo institucional</label>
+                <div class="campo-icono">
+                    <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                        <path d="M3 7l9 6 9-6" />
+                    </svg>
+                    <input id="correo" class="campo" type="email" formControlName="correo"
+                        placeholder="usuario@ucaldas.edu.co" autocomplete="email">
+                </div>
+            </div>
+
+            <!-- Documento y teléfono -->
+            <div class="fila-dos">
+                <div class="bloque">
+                    <label for="documento">Documento</label>
+                    <div class="campo-icono">
+                        <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 3h9l4 4v14H6z" />
+                            <path d="M14 3v5h5M9 13h6M9 17h6" />
+                        </svg>
+                        <input id="documento" class="campo" formControlName="documento" inputmode="numeric"
+                            placeholder="Número de documento">
+                    </div>
+                </div>
+
+                <div class="bloque">
+                    <label for="telefono">Teléfono</label>
+                    <div class="campo-icono">
+                        <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
+                        </svg>
+                        <input id="telefono" class="campo" formControlName="telefono" inputmode="tel"
+                            placeholder="Número de teléfono">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programa -->
+            <div class="bloque">
+                <label for="programaId">Selecciona tu programa</label>
+                <div class="campo-icono">
+                    <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 9l10-5 10 5-10 5z" />
+                        <path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" />
+                    </svg>
+                    <select id="programaId" class="campo campo-select" formControlName="programaId">
+                        <option [ngValue]="null">Selecciona un programa</option>
+                        @for (programa of programas(); track programa.id) {
+                        <option [ngValue]="programa.id">{{ programa.nombre }}</option>
+                        }
+                    </select>
+                    <svg class="icono icono-der" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Contraseñas -->
+            <div class="fila-dos">
+                <div class="bloque">
+                    <label for="clave">Contraseña</label>
+                    <div class="campo-icono">
+                        <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="11" width="14" height="10" rx="2" />
+                            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                        </svg>
+                        <input id="clave" class="campo campo-con-ojo" [type]="claveVisible() ? 'text' : 'password'"
+                            formControlName="clave" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+                        <button type="button" class="ver-clave" (click)="alternarClave()"
+                            [attr.aria-label]="claveVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+                                <circle cx="12" cy="12" r="3" />
+                                @if (claveVisible()) {
+                                <path d="M4 20L20 4" /> }
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bloque">
+                    <label for="confirmarClave">Confirmar contraseña</label>
+                    <div class="campo-icono">
+                        <svg class="icono icono-izq" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="11" width="14" height="10" rx="2" />
+                            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                        </svg>
+                        <input id="confirmarClave" class="campo campo-con-ojo"
+                            [type]="confirmarVisible() ? 'text' : 'password'" formControlName="confirmarClave"
+                            placeholder="Repite tu contraseña" autocomplete="new-password">
+                        <button type="button" class="ver-clave" (click)="alternarConfirmar()"
+                            [attr.aria-label]="confirmarVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+                                <circle cx="12" cy="12" r="3" />
+                                @if (confirmarVisible()) {
+                                <path d="M4 20L20 4" /> }
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Política de datos -->
+            <label class="politica">
+                <input type="checkbox" formControlName="aceptaPolitica">
+                <span>Acepto la <span class="enlace">política de tratamiento de datos</span> y los términos de
+                    uso.</span>
+            </label>
+
+            @if (mensajeError()) {
+            <div class="aviso-error" role="alert">{{ mensajeError() }}</div>
+            }
+
+            <button type="submit" class="boton-registrar" [disabled]="cargando()">
+                {{ cargando() ? 'Enviando...' : 'Registrarme →' }}
+            </button>
+        </form>
+
+        <p class="pie-caja">¿Ya tienes una cuenta? <a class="enlace" routerLink="/inicio">Inicia sesión</a></p>
+    </section>
+
+    <!-- Popup de registro exitoso (aparece encima del formulario) -->
+    @if (registroExitoso()) {
+    <div class="modal-fondo" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+        <div class="modal-caja">
+            <div class="modal-icono" aria-hidden="true">✓</div>
+            <h2 id="modal-titulo" class="modal-titulo">Registro exitoso</h2>
+            <p class="modal-texto">Tu cuenta fue creada. Ya puedes iniciar sesión.</p>
+            <a class="modal-boton" routerLink="/inicio">Iniciar sesión</a>
+        </div>
+    </div>
+    }
+</main>

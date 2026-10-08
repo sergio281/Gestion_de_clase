@@ -1,0 +1,39 @@
+/* ===== Paleta base del proyecto (valores medidos del diseño) ===== */
+:root {
+    --color-principal: #32db8a;
+    /* verde de botones y textos destacados */
+    --color-secundario: #6b8f84;
+    /* textos suaves (se usará en otras pantallas) */
+    --color-fondo: #eef7f4;
+    /* fondo de las tarjetas claras */
+    --color-texto: #11211d;
+    /* texto sobre fondo claro */
+    --color-blanco: #ffffff;
+
+    /* Colores de apoyo */
+    --color-oscuro: #11211d;
+    /* botón Registro y texto de botones verdes */
+    --color-marcador: #a1c2b8;
+    /* texto de ejemplo dentro de los campos */
+    --color-icono-candado: #008b72;
+    --color-icono-ojo: #526b68;
+    --color-error: #d6334a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, Arial, sans-serif;
+    color: var(--color-texto);
+    line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
