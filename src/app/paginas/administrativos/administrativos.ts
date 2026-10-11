@@ -6,10 +6,9 @@ import { ServicioAutenticacion } from '../../servicios/servicio-autenticacion';
 import { PLANTILLA_RECHAZO, ServicioCorreo } from '../../servicios/servicio-correo';
 import { ServicioHorarios } from '../../servicios/servicio-horarios';
 import {
-  ABREVIATURAS_DIAS, HORAS_TABLA, NOMBRES_DIAS, activaEnFecha, buscarCruce, darFormatoFecha,
+  ABREVIATURAS_DIAS, HORAS_TABLA, HORA_FIN_TABLA, NOMBRES_DIAS, activaEnFecha, buscarCruce, darFormatoFecha,
   obtenerDiaSemana, obtenerHoy, sumarDias, textoCruce, textoReserva, validarHorario,
 } from '../../horarios';
-
 // cualquier correo con formato válido (algo@dominio.ext)
 const FORMATO_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -37,7 +36,7 @@ const ESTADOS_DIRECTOR: ('activo' | 'inactivo')[] = ['activo', 'inactivo'];
 // pestañas del panel
 type Vista = 'matriz' | 'solicitudes' | 'salones' | 'equipos' | 'directores';
 
-// alto que necesita la lista de salones para abrirse completa hacia abajo
+// alto que necesita la lista de salones
 const ALTO_LISTA = 280;
 
 // "TV, Py" -> ['TV', 'Py']; vacío o "NG" significa sin dotación
@@ -87,7 +86,7 @@ interface FormularioDirectorAbierto {
   perfil: PerfilUsuario;
 }
 
-// aviso flotante abajo a la derecha (se cierra solo)
+// aviso flotante abajo a la derecha
 interface AvisoFlotante {
   titulo: string;
   texto: string;
@@ -103,7 +102,7 @@ interface FormularioSalonAbierto {
   salonId: number | null;
 }
 
-// lista de salones abierta: de qué solicitud es y dónde se dibuja (px respecto al componente)
+// lista de salones
 interface ListaSalones {
   solicitud: Reserva;
   top: number;
@@ -229,7 +228,7 @@ export class Administrativos implements OnInit {
         const reserva = this.reservas().find(r => r.salon_id === salon.id && r.estado === 'aprobada'
           && activaEnFecha(r, fecha) && r.hora_inicio <= hora && hora < r.hora_fin) ?? null;
         if (reserva && reserva.hora_inicio === hora) {
-          const largo = Math.min(reserva.hora_fin, 21) - hora;
+          const largo = Math.min(reserva.hora_fin, HORA_FIN_TABLA) - hora;
           celdas.push({ hora, largo, reserva });
           i += largo - 1;
         } else {
@@ -264,7 +263,7 @@ export class Administrativos implements OnInit {
     this.enrutador.navigate(['/inicio']);
   }
 
-  // cambia de pestaña y cierra la lista de salones si estaba abierta
+  // cerar sesion
   cambiarVista(vista: Vista): void {
     this.cerrarLista();
     this.mensajes.set([]);
@@ -290,7 +289,7 @@ export class Administrativos implements OnInit {
 
   // salones
 
-  // saca el motivo real del error de Supabase (HttpErrorResponse) para mostrarlo en pantalla
+  // motivo error de Supabase (HttpErrorResponse) 
   private motivoDelError(error: unknown, porDefecto: string): string {
     const e = error as { status?: number; message?: string; error?: { message?: string; details?: string; hint?: string } };
     if (e?.status === 401 || e?.status === 403) return `${porDefecto} Sin permiso en Supabase (RLS).`;
@@ -347,7 +346,7 @@ export class Administrativos implements OnInit {
 
       await this.cargarDatos();
 
-      // se comprueba que el cambio sí quedó en la base de datos
+      //  compruebar cambio en la base de datos
       const guardado = this.salones().find(s =>
         abierto.modo === 'crear' ? s.nombre === nombre : s.id === abierto.salonId);
       if (!guardado || guardado.nombre !== nombre || String(guardado.planta ?? '') !== datos.planta) {
@@ -367,7 +366,7 @@ export class Administrativos implements OnInit {
   }
 
   async eliminarSalon(salon: Salon): Promise<void> {
-    // un salón con asignaciones o solicitudes no se puede borrar sin dejarlas huérfanas
+    // un salón con asignaciones o solicitudes no se puede borrar
     const enUso = this.reservas().filter(r => r.salon_id === salon.id).length;
     if (enUso > 0) {
       this.salonAEliminar.set(null);
@@ -384,7 +383,7 @@ export class Administrativos implements OnInit {
       this.salonAEliminar.set(null);
       await this.cargarDatos();
 
-      // si el salón sigue en la lista, la base de datos no lo borró
+      // salón sigue en la lista, la base de datos no lo borró
       if (this.salones().some(s => s.id === salon.id)) throw new Error(MENSAJE_PERMISOS);
       this.mensajes.set([{ tipo: 'exito', texto: `Salón ${salon.nombre || '--'} eliminado.` }]);
     } catch (error) {
@@ -397,7 +396,7 @@ export class Administrativos implements OnInit {
 
   // formulario
 
-  // se usa tanto al crear como al arrastrar
+  //crea informacion automatica de la casilla
   private llenarFormulario(valores: ValoresIniciales): void {
     const { dias, ...campos } = valores;
     this.formularioMateria.reset({ ...campos, correoProfesor: '', correosEstudiantes: '' });
@@ -420,9 +419,9 @@ export class Administrativos implements OnInit {
     this.formularioAbierto.set({ modo: 'crear', salon, reservaId: null });
   }
 
-  // director del programa, si no hay ninguno toma el primero
+  // director del programa
   private directorDelPrograma(programaId: number): string {
-    // solo se toman directores activos
+    // toma directores activos
     const activos = this.directores().filter(d => (d.estado ?? 'activo') === 'activo');
     const director = activos.find(d => d.programa_id === programaId) ?? activos[0];
     return director?.id ?? '';
@@ -448,12 +447,12 @@ export class Administrativos implements OnInit {
     return director.estado === 'inactivo' ? 'inactivo' : 'activo';
   }
 
-  // clases y solicitudes que tiene el director (reservas aprobadas o pendientes)
+  // clases y solicitudes que tiene el director reservas aprobadas o pendientes
   private reservasDelDirector(id: string): number {
     return this.reservas().filter(r => r.director_id === id).length;
   }
 
-  // aviso flotante: se cierra solo a los 5 segundos
+  // aviso flotante se cierra solo a los 5 segundos
   private mostrarAviso(titulo: string, texto: string): void {
     if (this.temporizadorAviso) clearTimeout(this.temporizadorAviso);
     this.aviso.set({ titulo, texto });
@@ -491,7 +490,7 @@ export class Administrativos implements OnInit {
       await this.servicioHorarios.actualizarDirector(abierto.perfil.id, datos);
       await this.cargarDatos();
 
-      // se comprueba que el cambio sí quedó en la base de datos
+      // comprueba que el cambio sí quedó en la base de datos
       const guardado = this.directores().find(d => d.id === abierto.perfil.id);
       if (!guardado || guardado.nombre !== nombre || (guardado.programa_id ?? null) !== programaId
         || this.estadoDirector(guardado) !== datos.estado) {
@@ -507,7 +506,7 @@ export class Administrativos implements OnInit {
     }
   }
 
-  // botón Eliminar: si tiene clases o solicitudes solo se avisa, si no pide confirmación
+  // botón Eliminar
   pedirEliminarDirector(director: PerfilUsuario): void {
     if (this.reservasDelDirector(director.id) > 0) {
       this.mostrarAviso('No se puede eliminar', 'Ese director tiene clases o solicitudes asignadas.');
@@ -584,7 +583,7 @@ export class Administrativos implements OnInit {
 
       await this.cargarDatos();
 
-      // se comprueba que el cambio sí quedó en la base de datos
+      // comprueba que el cambio sí quedó en la base de datos
       const guardado = this.equipos().find(e =>
         abierto.modo === 'crear' ? e.nombre === nombre : e.id === abierto.equipoId);
       if (!guardado || guardado.nombre !== nombre || guardado.estado !== datos.estado) {
@@ -621,7 +620,7 @@ export class Administrativos implements OnInit {
     }
   }
 
-  // drag and drop
+  // arrastrar y soltar
 
   alIniciarArrastre(evento: DragEvent, reserva: Reserva): void {
     this.reservaArrastrada = reserva;
@@ -629,12 +628,12 @@ export class Administrativos implements OnInit {
     if (evento.dataTransfer) evento.dataTransfer.effectAllowed = 'move';
   }
 
-  // sin el preventDefault el navegador no deja soltar
+  // preventDefault
   permitirSoltar(evento: DragEvent): void {
     evento.preventDefault();
   }
 
-  // al soltar abre el formulario en modo editar con el salón y hora nuevos
+  //abre el formulario en modo editar
   alSoltarEnCelda(evento: DragEvent, salon: Salon, hora: number): void {
     evento.preventDefault();
     const reserva = this.reservaArrastrada;
@@ -648,7 +647,7 @@ export class Administrativos implements OnInit {
       fechaInicio: reserva.fecha_inicio,
       fechaFin: reserva.fecha_fin,
       horaInicio: hora,
-      horaFin: Math.min(hora + duracion, 21),
+      horaFin: Math.min(hora + duracion, HORA_FIN_TABLA),
       dias: [...reserva.dias],
     });
     this.formularioAbierto.set({ modo: 'editar', salon, reservaId: reserva.id });
@@ -826,10 +825,9 @@ export class Administrativos implements OnInit {
 
   // solicitudes
 
-  // menú de salones propio: la lista se dibuja fuera de la tabla, justo debajo del botón,
-  // así siempre se abre hacia abajo (el select nativo decide solo hacia dónde abrir)
+  // menú de salones propio (lista) 
   alternarLista(evento: Event, solicitud: Reserva): void {
-    // si ya estaba abierta para esta solicitud, se cierra
+
     if (this.listaSalones()?.solicitud.id === solicitud.id) {
       this.cerrarLista();
       return;
@@ -837,11 +835,9 @@ export class Administrativos implements OnInit {
 
     const boton = evento.currentTarget as HTMLElement;
 
-    // si abajo no hay espacio para la lista, baja la página (sin animación)
     const falta = ALTO_LISTA - (window.innerHeight - boton.getBoundingClientRect().bottom);
     if (falta > 0) window.scrollBy({ top: falta, behavior: 'instant' });
 
-    // posición del botón respecto al componente (así la lista se mueve con la página)
     const caja = boton.getBoundingClientRect();
     const base = this.elemento.nativeElement.getBoundingClientRect();
     this.listaSalones.set({
@@ -856,13 +852,13 @@ export class Administrativos implements OnInit {
     this.listaSalones.set(null);
   }
 
-  // al elegir un salón de la lista se aprueba la solicitud ahí y aparece en la matriz
+  // al elegir un salón  la lista se aprueba la solicitud ahí y aparece en la matriz
   elegirSalon(solicitud: Reserva, salonId: number): void {
     this.cerrarLista();
     this.aprobarSolicitud(solicitud, salonId);
   }
 
-  // revisa solo que el salón esté libre: mismas fechas, algún día en común y horas que se pisan
+  // verificar si el salón esté libre mismas fechas, algún día en común y horas que se pisan
   private salonOcupado(
     salonId: number,
     solicitud: Pick<Reserva, 'fecha_inicio' | 'fecha_fin' | 'dias' | 'hora_inicio' | 'hora_fin'> & { id?: number },
@@ -874,8 +870,7 @@ export class Administrativos implements OnInit {
       && r.hora_inicio < solicitud.hora_fin && solicitud.hora_inicio < r.hora_fin);
   }
 
-  // lápiz del detalle: abre el formulario en modo editar con los datos de la asignación
-  // para elegir a quién se le envía el correo (profesor y estudiantes)
+  // lápiz del detalle
   abrirEdicion(reserva: Reserva): void {
     const salon = this.salones().find(s => s.id === reserva.salon_id);
     if (!salon) return;

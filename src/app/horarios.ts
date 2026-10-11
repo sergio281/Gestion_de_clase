@@ -4,7 +4,9 @@ export const NOMBRES_DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes
 export const ABREVIATURAS_DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 // de 6:00 a 20:00
-export const HORAS_TABLA = Array.from({ length: 15 }, (_, indice) => 6 + indice);
+export const HORAS_TABLA = Array.from({ length: 16 }, (_, indice) => 7 + indice);
+export const HORA_FIN_TABLA = HORAS_TABLA[HORAS_TABLA.length - 1] + 1;
+
 
 // datos que se comparan para buscar cruces
 export interface DatosHorario {
