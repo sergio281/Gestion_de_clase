@@ -1,14 +1,13 @@
-<!-- Registro-->
 <main class="pantalla-registro">
 
-    <!-- Marca de la universidad -->
+    <!-- marca -->
     <a class="marca" routerLink="/inicio" aria-label="Ir al inicio">
         <img class="marca-logo" src="imagenes/logo-universidad.png" alt="Escudo de la Universidad de Caldas">
         <span class="marca-linea"></span>
         <span class="marca-nombre">Universidad<br>de Caldas</span>
     </a>
 
-    <!-- Mensaje institucional -->
+    <!-- mensaje -->
     <section class="presentacion">
         <h2 class="presentacion-titulo">Conocimiento que<br>transforma vidas</h2>
         <span class="presentacion-linea"></span>
@@ -17,17 +16,17 @@
         </p>
     </section>
 
-    <!-- Mascota -->
+    <!-- mascota -->
     <img class="mascota-registro" src="imagenes/mascota.png" alt="Mascota de la Universidad de Caldas">
 
-    <!-- Tarjeta de registro (siempre visible) -->
+    <!-- tarjeta -->
     <section class="caja-registro">
         <h1 class="caja-titulo">Crear cuenta</h1>
         <p class="caja-subtitulo">Regístrate para acceder a los servicios digitales de la Universidad.</p>
 
         <form [formGroup]="formularioRegistro" (ngSubmit)="enviarDatosFormulario()">
 
-            <!-- Nombre completo -->
+            <!-- nombre -->
             <div class="bloque">
                 <label for="nombreCompleto">Nombre completo</label>
                 <div class="campo-icono">
@@ -40,7 +39,7 @@
                 </div>
             </div>
 
-            <!-- Correo -->
+            <!-- correo -->
             <div class="bloque">
                 <label for="correo">Correo institucional</label>
                 <div class="campo-icono">
@@ -53,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- Documento y teléfono -->
+            <!-- documento y teléfono -->
             <div class="fila-dos">
                 <div class="bloque">
                     <label for="documento">Documento</label>
@@ -80,7 +79,7 @@
                 </div>
             </div>
 
-            <!-- Programa -->
+            <!-- programa -->
             <div class="bloque">
                 <label for="programaId">Selecciona tu programa</label>
                 <div class="campo-icono">
@@ -100,7 +99,7 @@
                 </div>
             </div>
 
-            <!-- Contraseñas -->
+            <!-- contraseñas -->
             <div class="fila-dos">
                 <div class="bloque">
                     <label for="clave">Contraseña</label>
@@ -146,7 +145,7 @@
                 </div>
             </div>
 
-            <!-- Política de datos -->
+            <!-- política -->
             <label class="politica">
                 <input type="checkbox" formControlName="aceptaPolitica">
                 <span>Acepto la <span class="enlace">política de tratamiento de datos</span> y los términos de
@@ -165,7 +164,7 @@
         <p class="pie-caja">¿Ya tienes una cuenta? <a class="enlace" routerLink="/inicio">Inicia sesión</a></p>
     </section>
 
-    <!-- Popup de registro exitoso (aparece encima del formulario) -->
+    <!-- popup de registro exitoso -->
     @if (registroExitoso()) {
     <div class="modal-fondo" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
         <div class="modal-caja">

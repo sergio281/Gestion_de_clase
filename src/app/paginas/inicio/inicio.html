@@ -1,6 +1,6 @@
 <main class="pantalla">
 
-    <!-- Encabezado: marca a la izquierda, Registro a la derecha -->
+    <!-- encabezado -->
     <header class="encabezado">
         <div class="marca">
             <img class="marca-logo" src="imagenes/logo-universidad.png" alt="Escudo de la Universidad de Caldas">
@@ -10,7 +10,7 @@
         <a class="registro" routerLink="/registro">Registro</a>
     </header>
 
-    <!-- Centro: titular a la izquierda y tarjeta a la derecha -->
+    <!-- titular y login -->
     <section class="centro">
         <h1 class="titulo-inicio">
             <span>Salones y equipos</span>
@@ -29,6 +29,7 @@
 
                 <label for="clave">Contraseña</label>
                 <div class="campo-clave">
+                    <!-- candado -->
                     <svg class="icono-clave" viewBox="0 0 11 12" aria-hidden="true">
                         <rect x="0.75" y="5" width="9.5" height="6.25" rx="1.5" fill="none" stroke="currentColor"
                             stroke-width="1.2" />
@@ -39,6 +40,7 @@
                     <input id="clave" class="campo" [type]="claveVisible() ? 'text' : 'password'"
                         formControlName="clave" placeholder="Mínimo 8 caracteres" autocomplete="current-password">
 
+                    <!-- ojo para mostrar u ocultar la clave -->
                     <button type="button" class="ver-clave" (click)="alternarVisibilidadClave()"
                         [attr.aria-label]="claveVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                         <svg viewBox="0 0 11 8" aria-hidden="true">
@@ -65,7 +67,7 @@
         </div>
     </section>
 
-    <!-- Descripción inferior -->
+    <!-- descripción -->
     <footer class="pie-texto">
         <span class="pie-linea"></span>
         <p>
@@ -74,6 +76,6 @@
         </p>
     </footer>
 
-    <!-- Mascota -->
+    <!-- mascota -->
     <img class="mascota-inicio" src="imagenes/mascota.png" alt="Mascota de la Universidad de Caldas">
 </main>

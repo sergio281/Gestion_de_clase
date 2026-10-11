@@ -1,18 +1,16 @@
-/* ---------- Pantalla completa con la foto de fondo ---------- */
+/* pantalla */
 .pantalla {
     position: relative;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    /* encabezado, centro y descripción, uno debajo del otro */
     padding: 0 30px;
-    /* espacio a los lados */
     color: white;
     background: #0f2f33 url('/imagenes/fondo-inicio.jpeg') center / cover;
 }
 
-/* ---------- Encabezado (logo a la izquierda, Registro a la derecha) ---------- */
+/* encabezado */
 .encabezado {
     display: flex;
     align-items: center;
@@ -28,7 +26,6 @@
 
 .marca-logo {
     height: 100px;
-    /* tamaño del escudo */
 }
 
 .marca-linea {
@@ -58,10 +55,9 @@
     text-decoration: none;
 }
 
-/* ---------- Centro: titular a la izquierda y tarjeta a la derecha ---------- */
+/* centro */
 .centro {
     flex: 1;
-    /* ocupa el espacio que sobra */
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -69,17 +65,14 @@
 
 .titulo-inicio {
     margin: 100px 0 0 5px;
-    /* separación de arriba */
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     font-size: 60px;
-    /* tamaño del titular */
     line-height: 1.15;
 }
 
 .titulo-inicio span {
     display: block;
-    /* cada línea en su renglón */
     white-space: nowrap;
 }
 
@@ -87,16 +80,13 @@
     color: var(--color-principal);
 }
 
-/* ---------- Tarjeta de ingreso ---------- */
+/* tarjeta de ingreso */
 .caja-ingreso {
     position: relative;
     z-index: 2;
-    /* queda por encima de la mascota */
     width: 28vw;
-    /* ancho de la tarjeta */
     min-width: 330px;
     margin: 70px 6vw 0 0;
-    /* arriba y derecha */
     padding: 38px 42px;
     border-radius: 34px;
     background-color: var(--color-fondo);
@@ -123,7 +113,6 @@
 .campo {
     width: 100%;
     height: 58px;
-    /* alto de los campos */
     padding: 0 24px;
     border: none;
     border-radius: 999px;
@@ -137,7 +126,7 @@
     color: var(--color-marcador);
 }
 
-/* Contraseña: candado a la izquierda y ojo a la derecha */
+/* contraseña */
 .campo-clave {
     position: relative;
 }
@@ -200,14 +189,12 @@
     cursor: not-allowed;
 }
 
-/* ---------- Descripción de abajo ---------- */
+/* descripción de abajo */
 .pie-texto {
     position: absolute;
     left: 40px;
     bottom: 40px;
-
     z-index: 3;
-    /* queda por encima de la mascota */
 }
 
 .pie-linea {
@@ -224,21 +211,17 @@
     line-height: 1.4;
 }
 
-/* ---------- Mascota---------- */
+/* mascota */
 .mascota-inicio {
     position: absolute;
     bottom: 0;
     right: 31vw;
-    /* más grande = más a la izquierda */
-    height: 84px;
-    /* tamaño de la mascota */
+    height: 70vh;
     z-index: 1;
     pointer-events: none;
 }
 
-/* =====================================================
-   LAPTOPS (pantallas de hasta 1400 px de ancho): todo un poco más pequeño
-   ===================================================== */
+/* laptops */
 @media (max-width: 1400px) {
     .marca-logo {
         height: 80px;
@@ -300,11 +283,7 @@
     }
 }
 
-
-
-/* =====================================================
-   TABLET Y CELULAR (hasta 900 px): una sola columna, sin mascota
-   ===================================================== */
+/* tablet y celular */
 @media (max-width: 900px) {
     .pantalla {
         height: auto;
@@ -377,6 +356,7 @@
         font-size: 14px;
     }
 
+    /* la mascota no se muestra en pantallas pequeñas */
     .mascota-inicio {
         display: none;
     }

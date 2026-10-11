@@ -1,9 +1,6 @@
-// Tipos y constantes compartidas por todo el proyecto.
-
-/** Roles del sistema. */
 export type RolUsuario = 'administrativo' | 'director-academico';
 
-/** Datos de una persona registrada (tabla "perfiles"). */
+// tabla perfiles
 export interface PerfilUsuario {
     id: string;
     nombre: string;
@@ -12,9 +9,11 @@ export interface PerfilUsuario {
     telefono: string | null;
     rol: RolUsuario;
     programa_id: number | null;
+    // 'activo' o 'inactivo' (un director inactivo no recibe asignaciones automáticas)
+    estado?: 'activo' | 'inactivo' | null;
 }
 
-/** Franja oficial de un programa: días (0 = lunes ... 6 = domingo) y horas. */
+// dias: 0 = lunes ... 6 = domingo
 export interface FranjaHoraria {
     dias: number[];
     inicio: number;
@@ -24,16 +23,28 @@ export interface FranjaHoraria {
 export interface Programa {
     id: number;
     nombre: string;
+    horario_texto?: string;
+    ventanas?: FranjaHoraria[] | null;
 }
 
+// planta: '1' o '2'
+// dotacion: ['TV'], ['Py'], ['Inf.', 'TV']... un arreglo vacío significa sin dotación (NG)
 export interface Salon {
     id: number;
     nombre: string;
+    planta: string;
     dotacion: string[];
 }
 
-/** Solicitud de salón (tabla "reservas"). */
-export interface SolicitudSalon {
+// tabla equipos (inventario de préstamo)
+export interface Equipo {
+    id: number;
+    nombre: string;
+    estado: 'disponible' | 'prestado' | 'mantenimiento';
+}
+
+// tabla reservas (solicitud o materia asignada)
+export interface Reserva {
     id: number;
     salon_id: number | null;
     programa_id: number;
@@ -46,18 +57,21 @@ export interface SolicitudSalon {
     hora_fin: number;
     necesidad: string | null;
     estado: 'pendiente' | 'aprobada';
-    salon?: { nombre: string } | null;
-    programa?: { nombre: string } | null;
-    director?: { nombre: string; correo: string } | null;
 }
 
-/** Respuesta de Supabase al iniciar sesión. */
+export interface Estudiante {
+    id: number;
+    correo: string;
+    programa_id: number;
+}
+
+// respuesta del login de supabase
 export interface RespuestaSesion {
     access_token: string;
     user: { id: string };
 }
 
-/** Datos que pide el formulario de registro. */
+// datos del formulario de registro
 export interface DatosRegistro {
     nombreCompleto: string;
     correo: string;
@@ -66,7 +80,3 @@ export interface DatosRegistro {
     programaId: number;
     clave: string;
 }
-
-export const NOMBRES_DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
-export const OPCIONES_NECESIDAD = ['Cualquiera', 'Televisor', 'Proyector', 'Sala de informática', 'Laboratorio'];

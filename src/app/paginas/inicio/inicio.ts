@@ -22,10 +22,12 @@ export class Inicio {
     clave: new FormControl('', { nonNullable: true }),
   });
 
+  // mostrar u ocultar la contraseña
   alternarVisibilidadClave(): void {
     this.claveVisible.update(visible => !visible);
   }
 
+  // login
   enviarDatosFormulario(): void {
     this.mensajeError.set('');
     const correo = this.formularioIngreso.controls.correo.value.trim().toLowerCase();
@@ -40,6 +42,7 @@ export class Inicio {
     this.servicioAutenticacion.iniciarSesion(correo, clave).subscribe({
       next: perfil => {
         this.cargando.set(false);
+        // cada rol va a su panel
         const ruta = perfil.rol === 'administrativo' ? '/administrativos' : '/director-academico';
         this.enrutador.navigate([ruta]);
       },
