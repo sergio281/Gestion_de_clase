@@ -1,7 +1,674 @@
-<main style="padding: 24px">
-    <h1>Panel administrativo</h1>
-    @if (perfil(); as p) {
-    <p>Bienvenido, {{ p.nombre }} ({{ p.rol }})</p>
+<div class="panel-administrativo">
+
+    <header class="encabezado-panel">
+
+        <div class="fila-superior">
+            <h1 class="titulo-panel">Salones Guarinó</h1>
+            <div class="datos-usuario">
+                <span class="texto-usuario">{{ nombreUsuario() }} · admin</span>
+                <button type="button" class="boton-salir" (click)="cerrarSesion()">Salir</button>
+            </div>
+        </div>
+
+        <div class="estadisticas">
+            <div class="estadistica">
+                <span class="numero-estadistica">{{ salones().length }}</span>
+                <span class="etiqueta-estadistica">Salones</span>
+            </div>
+            <div class="estadistica">
+                <span class="numero-estadistica">{{ asignaciones() }}</span>
+                <span class="etiqueta-estadistica">Asignaciones</span>
+            </div>
+            <div class="estadistica">
+                <span class="numero-estadistica">{{ solicitudesPendientes() }}</span>
+                <span class="etiqueta-estadistica">Solicitudes pendientes</span>
+            </div>
+            <div class="estadistica">
+                <span class="numero-estadistica">{{ equiposPrestados() }}</span>
+                <span class="etiqueta-estadistica">Equipos prestados</span>
+            </div>
+        </div>
+
+        <!-- por ahora solo funciona la matriz, las demás pestañas quedan deshabilitadas -->
+        <nav class="pestanas-panel" aria-label="Secciones del panel">
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'matriz'"
+                (click)="cambiarVista('matriz')">Matriz de horarios</button>
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'solicitudes'"
+                (click)="cambiarVista('solicitudes')">Solicitudes</button>
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'salones'"
+                (click)="cambiarVista('salones')">Salones</button>
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'equipos'"
+                (click)="cambiarVista('equipos')">Equipos</button>
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'directores'"
+                (click)="cambiarVista('directores')">Directores</button>
+        </nav>
+    </header>
+
+    @if (vista() === 'matriz') {
+    <main class="tarjeta-matriz">
+
+        <div class="encabezado-tarjeta">
+            <h2 class="titulo-tarjeta">Ocupación de salones</h2>
+
+            <div class="selector-fecha">
+                <button type="button" class="boton-flecha" (click)="moverFecha(-1)"
+                    aria-label="Día anterior">&lt;</button>
+                <input class="campo-fecha" type="date" [value]="fecha()"
+                    (change)="cambiarFecha($any($event.target).value)" aria-label="Fecha de la matriz">
+                <button type="button" class="boton-flecha" (click)="moverFecha(1)"
+                    aria-label="Día siguiente">&gt;</button>
+                <button type="button" class="boton-hoy" (click)="irAHoy()">Hoy</button>
+            </div>
+        </div>
+
+        <p class="subtitulo-tarjeta">{{ nombreDiaActual() }} {{ fechaFormateada() }} · Pulsa una celda libre para
+            asignar un salón o pulsa una asignación para ver o eliminarla</p>
+
+        <!-- mensajes de éxito, info o advertencia -->
+        @if (mensajes().length) {
+        <div class="zona-mensajes" aria-live="polite">
+            @for (mensaje of mensajes(); track $index) {
+            <p class="mensaje" [class.mensaje-exito]="mensaje.tipo === 'exito'"
+                [class.mensaje-informacion]="mensaje.tipo === 'informacion'"
+                [class.mensaje-advertencia]="mensaje.tipo === 'advertencia'">{{ mensaje.texto }}</p>
+            }
+        </div>
+        }
+
+        <!-- una fila por salón, una columna por hora -->
+        <div class="contenedor-tabla">
+            <table class="tabla-matriz">
+                <thead>
+                    <tr>
+                        <th class="columna-salon">Salón</th>
+                        @for (hora of horasTabla; track hora) {
+                        <th class="encabezado-hora">{{ hora }}:00</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (fila of filas(); track fila.salon.id) {
+                    <tr class="fila-salon">
+                        <td class="columna-salon">{{ fila.salon.nombre }}</td>
+
+                        @for (celda of fila.celdas; track celda.hora) {
+                        @if (celda.reserva) {
+                        <!-- ocupada: el bloque se arrastra y el clic abre el detalle -->
+                        <td class="celda-ocupada" [attr.colspan]="celda.largo" (dragover)="permitirSoltar($event)"
+                            (drop)="alSoltarEnCelda($event, fila.salon, celda.hora)">
+                            <div class="bloque-materia" draggable="true"
+                                (dragstart)="alIniciarArrastre($event, celda.reserva)"
+                                (click)="detalle.set(celda.reserva)">{{ celda.reserva.asignatura }}</div>
+                        </td>
+                        } @else {
+                        <!-- libre: abre el formulario o recibe un bloque arrastrado -->
+                        <td class="celda-libre" (click)="abrirFormularioNuevo(fila.salon, celda.hora)"
+                            (dragover)="permitirSoltar($event)"
+                            (drop)="alSoltarEnCelda($event, fila.salon, celda.hora)"></td>
+                        }
+                        }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
     }
-    <button type="button" (click)="salir()">Cerrar sesión</button>
-</main>
+
+    <!-- solicitudes -->
+    @if (vista() === 'solicitudes') {
+    <main class="tarjeta-matriz tarjeta-solicitudes">
+        <h2 class="titulo-tarjeta">Solicitudes de directores</h2>
+
+        @if (mensajes().length) {
+        <div class="zona-mensajes" aria-live="polite">
+            @for (mensaje of mensajes(); track $index) {
+            <p class="mensaje" [class.mensaje-exito]="mensaje.tipo === 'exito'"
+                [class.mensaje-informacion]="mensaje.tipo === 'informacion'"
+                [class.mensaje-advertencia]="mensaje.tipo === 'advertencia'">{{ mensaje.texto }}</p>
+            }
+        </div>
+        }
+
+        <div class="contenedor-tabla">
+            <table class="tabla-solicitudes">
+                <thead>
+                    <tr>
+                        <th>Asignatura</th>
+                        <th>Horario</th>
+                        <th>Necesita</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (solicitud of pendientes(); track solicitud.id) {
+                    <tr>
+                        <td>{{ solicitud.asignatura }}</td>
+                        <td>{{ textoReserva(solicitud) }} · {{ solicitud.hora_inicio }}:00 - {{ solicitud.hora_fin }}:00
+                        </td>
+                        <td>{{ solicitud.necesidad }}</td>
+                        <td class="acciones-solicitud">
+                            <div class="botones-solicitud">
+                                <button type="button" class="boton-confirmar" [disabled]="guardando()"
+                                    (click)="aprobarSolicitud(solicitud)">Aprobar</button>
+                                <button type="button" class="boton-rechazar"
+                                    (click)="solicitudARechazar.set(solicitud)">Rechazar</button>
+                            </div>
+
+                            <!-- menú propio: la lista se dibuja fuera de la tabla y siempre se abre hacia abajo -->
+                            <button type="button" class="campo-salon boton-selector-salon" [disabled]="guardando()"
+                                aria-haspopup="listbox"
+                                [attr.aria-expanded]="listaSalones()?.solicitud?.id === solicitud.id"
+                                (click)="alternarLista($event, solicitud)">
+                                Seleccionar salón ▾
+                            </button>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="4">No hay solicitudes pendientes.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- lista de salones: el fondo transparente sirve para cerrarla al hacer clic afuera -->
+    @if (listaSalones(); as lista) {
+    <div class="fondo-lista" (click)="cerrarLista()"></div>
+    <ul class="lista-salones" role="listbox" [style.top.px]="lista.top" [style.left.px]="lista.left"
+        [style.min-width.px]="lista.ancho">
+        @for (salon of salones(); track salon.id) {
+        <li role="option" (click)="elegirSalon(lista.solicitud, salon.id)">{{ salon.nombre }}</li>
+        }
+    </ul>
+    }
+    }
+
+    <!-- salones y dotación -->
+    @if (vista() === 'salones') {
+    <main class="tarjeta-matriz">
+        <div class="encabezado-tarjeta">
+            <h2 class="titulo-tarjeta">Salones y dotación</h2>
+            <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nuevo salón</button>
+        </div>
+
+        <p class="subtitulo-tarjeta">NG = sin dotación · TV = televisor · Py = proyector · Inf. = sala de informática
+        </p>
+
+        @if (mensajes().length) {
+        <div class="zona-mensajes" aria-live="polite">
+            @for (mensaje of mensajes(); track $index) {
+            <p class="mensaje" [class.mensaje-exito]="mensaje.tipo === 'exito'"
+                [class.mensaje-informacion]="mensaje.tipo === 'informacion'"
+                [class.mensaje-advertencia]="mensaje.tipo === 'advertencia'">{{ mensaje.texto }}</p>
+            }
+        </div>
+        }
+
+        <div class="contenedor-tabla">
+            <table class="tabla-salones">
+                <thead>
+                    <tr>
+                        <th>Salón</th>
+                        <th>Planta</th>
+                        <th>Dotación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (salon of salones(); track salon.id) {
+                    <tr>
+                        <td>{{ salon.nombre || '--' }}</td>
+                        <td>{{ salon.planta || '--' }}</td>
+                        <td>
+                            <div class="grupo-insignias">
+                                @for (etiqueta of etiquetasDotacion(salon); track $index) {
+                                <span class="insignia-dotacion">{{ etiqueta }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="acciones-salon">
+                            <button type="button" class="boton-editar-salon"
+                                (click)="abrirFormularioSalonEditar(salon)">Editar</button>
+                            <button type="button" class="boton-eliminar-salon"
+                                (click)="salonAEliminar.set(salon)">Eliminar</button>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="4">No hay salones registrados.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+    }
+
+    <!-- equipos: inventario y préstamos -->
+    @if (vista() === 'equipos') {
+    <main class="tarjeta-matriz">
+        <div class="encabezado-tarjeta">
+            <h2 class="titulo-tarjeta">Inventario y préstamos</h2>
+            <button type="button" class="boton-hoy" (click)="abrirFormularioEquipoNuevo()">Nuevo equipo</button>
+        </div>
+
+        <p class="subtitulo-tarjeta">Los equipos en estado «Prestado» se cuentan en el recuadro «Equipos prestados».</p>
+
+        @if (mensajes().length) {
+        <div class="zona-mensajes" aria-live="polite">
+            @for (mensaje of mensajes(); track $index) {
+            <p class="mensaje" [class.mensaje-exito]="mensaje.tipo === 'exito'"
+                [class.mensaje-informacion]="mensaje.tipo === 'informacion'"
+                [class.mensaje-advertencia]="mensaje.tipo === 'advertencia'">{{ mensaje.texto }}</p>
+            }
+        </div>
+        }
+
+        <div class="contenedor-tabla">
+            <table class="tabla-equipos">
+                <thead>
+                    <tr>
+                        <th>Equipo</th>
+                        <th>Estado</th>
+                        <th>Trazabilidad</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (equipo of equipos(); track equipo.id) {
+                    <tr>
+                        <td>{{ equipo.nombre }}</td>
+                        <td>
+                            <span class="insignia-estado" [class.estado-disponible]="equipo.estado === 'disponible'"
+                                [class.estado-prestado]="equipo.estado === 'prestado'"
+                                [class.estado-mantenimiento]="equipo.estado === 'mantenimiento'">{{
+                                etiquetaEstado(equipo.estado) }}</span>
+                        </td>
+                        <td>--</td>
+                        <td class="acciones-salon">
+                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <button type="button" class="boton-editar-salon"
+                                (click)="abrirFormularioEquipoEditar(equipo)">Editar</button>
+                            <button type="button" class="boton-eliminar-salon"
+                                (click)="equipoAEliminar.set(equipo)">Eliminar</button>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="4">No hay equipos registrados.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+    }
+
+    <!-- directores -->
+    @if (vista() === 'directores') {
+    <main class="tarjeta-matriz">
+        <h2 class="titulo-tarjeta">Directores</h2>
+
+        <p class="subtitulo-tarjeta">Un director inactivo no recibe asignaciones automáticas. No se puede eliminar a
+            quien
+            tenga clases o solicitudes.</p>
+
+        @if (mensajes().length) {
+        <div class="zona-mensajes" aria-live="polite">
+            @for (mensaje of mensajes(); track $index) {
+            <p class="mensaje" [class.mensaje-exito]="mensaje.tipo === 'exito'"
+                [class.mensaje-informacion]="mensaje.tipo === 'informacion'"
+                [class.mensaje-advertencia]="mensaje.tipo === 'advertencia'">{{ mensaje.texto }}</p>
+            }
+        </div>
+        }
+
+        <div class="contenedor-tabla">
+            <table class="tabla-directores">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Programa</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (director of directores(); track director.id) {
+                    <tr>
+                        <td>{{ director.nombre }}</td>
+                        <td class="correo-director">{{ director.correo }}</td>
+                        <td>{{ nombreProgramaDirector(director) }}</td>
+                        <td>
+                            <span class="insignia-estado" [class.estado-activo]="estadoDirector(director) === 'activo'"
+                                [class.estado-inactivo]="estadoDirector(director) === 'inactivo'">{{
+                                estadoDirector(director) }}</span>
+                        </td>
+                        <td class="acciones-salon">
+                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <button type="button" class="boton-editar-salon"
+                                (click)="abrirFormularioDirector(director)">Editar</button>
+                            <button type="button" class="boton-eliminar-salon"
+                                (click)="pedirEliminarDirector(director)">Eliminar</button>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="5">No hay directores registrados.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+    }
+
+    <!-- formulario crear / editar -->
+    @if (formularioAbierto(); as abierto) {
+    <div class="fondo-ventana" (click)="cerrarFormulario()">
+        <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-ventana">
+                {{ abierto.modo === 'crear' ? 'Asignar ' + abierto.salon.nombre + ' · ' + fechaFormateada() : 'Editar
+                asignación en ' + abierto.salon.nombre }}
+            </h3>
+
+            <!-- revisarCruces se ejecuta cada vez que cambia un campo -->
+            <div class="campos-formulario" [formGroup]="formularioMateria" (change)="revisarCruces()">
+
+                <label class="etiqueta-formulario" for="asignatura">Asignatura</label>
+                <input id="asignatura" class="campo-formulario" formControlName="asignatura">
+
+                <label class="etiqueta-formulario" for="programa">Programa</label>
+                <select id="programa" class="campo-formulario" formControlName="programaId">
+                    @for (programa of programas(); track programa.id) {
+                    <option [ngValue]="programa.id">{{ programa.nombre }}</option>
+                    }
+                </select>
+                <p class="ayuda-formulario">
+                    @if (estudiantesDelPrograma() > 0) {
+                    {{ estudiantesDelPrograma() }} estudiante(s) de este programa recibirán la confirmación.
+                    } @else {
+                    Aún no hay estudiantes en este programa: pega sus correos abajo para que reciban el aviso.
+                    }
+                </p>
+
+                <label class="etiqueta-formulario" for="estudiantes">Estudiantes </label>
+                <textarea id="estudiantes" class="campo-formulario campo-area" rows="3"
+                    formControlName="correosEstudiantes"
+                    placeholder="correo1@gmail.com, correo2@ucaldas.edu.co"></textarea>
+
+                <!-- a este correo le llega el aviso -->
+                <label class="etiqueta-formulario" for="profesor">Profesor (correo)</label>
+                <input id="profesor" class="campo-formulario" type="email" formControlName="correoProfesor"
+                    placeholder="profesor@correo.com">
+
+                <div class="fila-dos-campos">
+                    <div>
+                        <label class="etiqueta-formulario" for="desde">Desde fecha</label>
+                        <input id="desde" class="campo-formulario" type="date" formControlName="fechaInicio">
+                    </div>
+                    <div>
+                        <label class="etiqueta-formulario" for="hasta">Hasta fecha</label>
+                        <input id="hasta" class="campo-formulario" type="date" formControlName="fechaFin">
+                    </div>
+                </div>
+
+                <span class="etiqueta-formulario">Días de la semana</span>
+                <div class="grupo-dias">
+                    @for (dia of abreviaturasDias; track $index) {
+                    <label class="casilla-dia">
+                        <input type="checkbox" [checked]="diasSeleccionados().includes($index)"
+                            (change)="alternarDia($index)">
+                        {{ dia }}
+                    </label>
+                    }
+                </div>
+                <p class="ayuda-formulario">Se repite cada semana en los días marcados entre las dos fechas.</p>
+
+                <div class="fila-dos-campos">
+                    <div>
+                        <label class="etiqueta-formulario" for="inicio">Inicio</label>
+                        <select id="inicio" class="campo-formulario" formControlName="horaInicio">
+                            @for (hora of horasTabla; track hora) {
+                            <option [ngValue]="hora">{{ hora }}:00</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="etiqueta-formulario" for="fin">Fin</label>
+                        <select id="fin" class="campo-formulario" formControlName="horaFin">
+                            @for (hora of horasFin; track hora) {
+                            <option [ngValue]="hora">{{ hora }}:00</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- cruces o reglas del programa -->
+            @if (advertencia()) {
+            <p class="mensaje mensaje-advertencia" role="alert">{{ advertencia() }}</p>
+            }
+
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="cerrarFormulario()">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()" (click)="guardarMateria()">
+                    {{ guardando() ? 'Guardando...' : (abierto.modo === 'crear' ? 'Asignar y notificar' : 'Guardar y
+                    notificar') }}
+                </button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- detalle de la asignación -->
+    @if (detalle(); as reserva) {
+    <div class="fondo-ventana" (click)="detalle.set(null)">
+        <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <div class="encabezado-detalle">
+                <h3 class="titulo-detalle">{{ reserva.asignatura }}</h3>
+                <button type="button" class="boton-lapiz" (click)="abrirEdicion(reserva)"
+                    aria-label="Actualizar asignación" title="Actualizar y notificar">✎</button>
+            </div>
+            <p class="texto-detalle">{{ nombrePrograma(reserva.programa_id) }}</p>
+            <p class="texto-detalle texto-detalle-suave">
+                Salón {{ nombreSalon(reserva.salon_id) }} · {{ textoReserva(reserva) }} · {{ reserva.hora_inicio }}:00 a
+                {{ reserva.hora_fin }}:00
+            </p>
+            @if (correoDirector(reserva.director_id)) {
+            <p class="correo-detalle">{{ correoDirector(reserva.director_id) }}</p>
+            }
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="detalle.set(null)">Cancelar</button>
+                <button type="button" class="boton-confirmar" (click)="eliminarMateria(reserva)">Eliminar
+                    asignación</button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- confirmar rechazo -->
+    @if (solicitudARechazar(); as solicitud) {
+    <div class="fondo-ventana" (click)="solicitudARechazar.set(null)">
+        <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-detalle">Confirmar acción</h3>
+            <p class="texto-detalle">¿Rechazar la solicitud «{{ solicitud.asignatura }}»?</p>
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="solicitudARechazar.set(null)">Cancelar</button>
+                <button type="button" class="boton-confirmar" (click)="rechazarSolicitud(solicitud)">Rechazar</button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- formulario de salón: nuevo / editar -->
+    @if (formularioSalonAbierto(); as abiertoSalon) {
+    <div class="fondo-ventana" (click)="cerrarFormularioSalon()">
+        <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-ventana">{{ abiertoSalon.modo === 'crear' ? 'Nuevo salón' : 'Editar salón' }}</h3>
+
+            <div class="campos-formulario" [formGroup]="formularioSalon">
+                <label class="etiqueta-formulario" for="nombre-salon">Nombre</label>
+                <input id="nombre-salon" class="campo-formulario" formControlName="nombre" placeholder="Ej: A-210">
+
+                <label class="etiqueta-formulario" for="planta-salon">Planta</label>
+                <select id="planta-salon" class="campo-formulario" formControlName="planta">
+                    @for (planta of plantas(); track planta) {
+                    <option [value]="planta">{{ planta }}</option>
+                    }
+                </select>
+
+                <label class="etiqueta-formulario" for="dotacion-salon">Dotación</label>
+                <input id="dotacion-salon" class="campo-formulario" formControlName="dotacion" placeholder="TV, Py">
+                <p class="ayuda-formulario">Sepárala con comas. Déjala vacía si el salón no tiene dotación (NG).</p>
+            </div>
+
+            @if (advertenciaSalon()) {
+            <p class="mensaje mensaje-advertencia" role="alert">{{ advertenciaSalon() }}</p>
+            }
+
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="cerrarFormularioSalon()">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()" (click)="guardarSalon()">
+                    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+                </button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- confirmar eliminar salón -->
+    @if (salonAEliminar(); as salon) {
+    <div class="fondo-ventana" (click)="salonAEliminar.set(null)">
+        <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-detalle">Confirmar acción</h3>
+            <p class="texto-detalle">¿Eliminar el salón {{ salon.nombre || '--' }}?</p>
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="salonAEliminar.set(null)">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()"
+                    (click)="eliminarSalon(salon)">Eliminar</button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- formulario de equipo: nuevo / editar -->
+    @if (formularioEquipoAbierto(); as abiertoEquipo) {
+    <div class="fondo-ventana" (click)="cerrarFormularioEquipo()">
+        <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-ventana">{{ abiertoEquipo.modo === 'crear' ? 'Nuevo equipo' : 'Editar equipo' }}</h3>
+
+            <div class="campos-formulario" [formGroup]="formularioEquipo">
+                <label class="etiqueta-formulario" for="nombre-equipo">Nombre</label>
+                <input id="nombre-equipo" class="campo-formulario" formControlName="nombre"
+                    placeholder="Ej: Proyector Epson 03">
+
+                <label class="etiqueta-formulario" for="estado-equipo">Estado</label>
+                <select id="estado-equipo" class="campo-formulario" formControlName="estado">
+                    @for (estado of estadosEquipo; track estado) {
+                    <option [value]="estado">{{ etiquetaEstado(estado) }}</option>
+                    }
+                </select>
+            </div>
+
+            @if (advertenciaEquipo()) {
+            <p class="mensaje mensaje-advertencia" role="alert">{{ advertenciaEquipo() }}</p>
+            }
+
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="cerrarFormularioEquipo()">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()" (click)="guardarEquipo()">
+                    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+                </button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- confirmar eliminar equipo -->
+    @if (equipoAEliminar(); as equipo) {
+    <div class="fondo-ventana" (click)="equipoAEliminar.set(null)">
+        <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-detalle">Confirmar acción</h3>
+            <p class="texto-detalle">¿Eliminar este equipo del inventario? ({{ equipo.nombre }})</p>
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="equipoAEliminar.set(null)">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()"
+                    (click)="eliminarEquipo(equipo)">Eliminar</button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- editar director -->
+    @if (formularioDirectorAbierto(); as abiertoDirector) {
+    <div class="fondo-ventana" (click)="cerrarFormularioDirector()">
+        <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-ventana">Editar director</h3>
+
+            <div class="campos-formulario" [formGroup]="formularioDirector">
+                <label class="etiqueta-formulario" for="nombre-director">Nombre</label>
+                <input id="nombre-director" class="campo-formulario" formControlName="nombre">
+
+                <!-- el correo es el usuario de acceso, no se cambia desde aquí -->
+                <label class="etiqueta-formulario" for="correo-director">Correo</label>
+                <input id="correo-director" class="campo-formulario" [value]="abiertoDirector.perfil.correo" disabled>
+
+                <label class="etiqueta-formulario" for="programa-director">Programa</label>
+                <select id="programa-director" class="campo-formulario" formControlName="programaId">
+                    <option value="">Sin programa</option>
+                    @for (programa of programas(); track programa.id) {
+                    <option [value]="programa.id">{{ programa.nombre }}</option>
+                    }
+                </select>
+
+                <label class="etiqueta-formulario" for="estado-director">Estado</label>
+                <select id="estado-director" class="campo-formulario" formControlName="estado">
+                    @for (estado of estadosDirector; track estado) {
+                    <option [value]="estado">{{ estado }}</option>
+                    }
+                </select>
+            </div>
+
+            @if (advertenciaDirector()) {
+            <p class="mensaje mensaje-advertencia" role="alert">{{ advertenciaDirector() }}</p>
+            }
+
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="cerrarFormularioDirector()">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()" (click)="guardarDirector()">
+                    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+                </button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- confirmar eliminar director -->
+    @if (directorAEliminar(); as director) {
+    <div class="fondo-ventana" (click)="directorAEliminar.set(null)">
+        <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <h3 class="titulo-detalle">Confirmar acción</h3>
+            <p class="texto-detalle">¿Eliminar al director {{ director.nombre }}? También se borra su usuario de acceso.
+            </p>
+            <div class="botones-ventana">
+                <button type="button" class="boton-cancelar" (click)="directorAEliminar.set(null)">Cancelar</button>
+                <button type="button" class="boton-confirmar" [disabled]="guardando()"
+                    (click)="eliminarDirector(director)">Eliminar</button>
+            </div>
+        </section>
+    </div>
+    }
+
+    <!-- aviso flotante (abajo a la derecha) -->
+    @if (aviso(); as avisoActual) {
+    <div class="aviso-flotante" role="status" aria-live="polite">
+        <strong class="aviso-titulo">{{ avisoActual.titulo }}</strong>
+        <span class="aviso-texto">{{ avisoActual.texto }}</span>
+    </div>
+    }
+</div>

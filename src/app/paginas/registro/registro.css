@@ -1,146 +1,137 @@
-/* =====================================================
-   PANTALLA DE REGISTRO  (CSS simple: px, vh, vw)
-   Para cambiar un tamaño, solo cambia el número.
-   ===================================================== */
+/* registro
+   --u = 1px del mockup (942x618), la tarjeta se mide en múltiplos de --u */
 
-/* ---------- Pantalla completa con la foto de fondo ----------
-   Si tienes una foto distinta para el registro, cambia el nombre del archivo. */
 .pantalla-registro {
+    --u: min(calc(100vw / 942), calc(100vh / 618));
+
     position: relative;
     height: 100vh;
     overflow: hidden;
     display: flex;
     justify-content: flex-end;
-    /* la tarjeta va a la derecha */
     align-items: center;
-    padding: 0 4vw;
+    padding: 0 30px;
     color: white;
     background: #0f2f33 url('/imagenes/fondo-inicio.jpeg') center / cover;
 }
 
-/* ---------- Marca (arriba a la izquierda). Al tocarla lleva al inicio ---------- */
+/* marca (lleva al inicio) */
 .marca {
     position: absolute;
     top: 18px;
-    left: 24px;
+    left: 30px;
     z-index: 3;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     color: inherit;
     text-decoration: none;
     cursor: pointer;
 }
 
 .marca-logo {
-    height: 70px;
+    height: 100px;
 }
 
 .marca-linea {
-    width: 3px;
-    height: 56px;
+    width: 4px;
+    height: 80px;
     background-color: var(--color-principal);
 }
 
 .marca-nombre {
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 19px;
     line-height: 1.25;
 }
 
-/* ---------- Mensaje institucional (izquierda) ---------- */
+/* mensaje de la izquierda */
 .presentacion {
     position: absolute;
-    top: 27vh;
-    /* qué tan abajo empieza */
-    left: 4.5vw;
+    top: 30vh;
+    left: 35px;
 }
 
 .presentacion-titulo {
     margin: 0;
-    font-size: 40px;
-    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 44px;
+    font-weight: 600;
     line-height: 1.15;
 }
 
 .presentacion-linea {
     display: block;
-    width: 70px;
+    width: 85px;
     height: 4px;
-    margin: 16px 0;
+    margin: 18px 0;
     background-color: var(--color-principal);
 }
 
 .presentacion-texto {
-    max-width: 400px;
+    max-width: 420px;
     margin: 0;
     font-size: 18px;
     line-height: 1.5;
 }
 
-/* ---------- Mascota: pegada abajo, junto a la tarjeta ---------- */
+/* mascota */
 .mascota-registro {
     position: absolute;
     bottom: 0;
-    right: 42vw;
-    /* más grande = más a la izquierda */
-    height: 64vh;
-    /* tamaño de la mascota */
+    /* se pega a la tarjeta, el 10.4vh es el espacio vacío de la imagen */
+    right: calc(6vw + 360 * var(--u) - 10.4vh);
+    height: 70vh;
     z-index: 1;
     pointer-events: none;
 }
 
-/* ---------- Tarjeta de registro ---------- */
+/* tarjeta */
 .caja-registro {
     position: relative;
     z-index: 2;
-    /* por encima de la mascota */
-    width: 480px;
-    /* ancho de la tarjeta */
-    max-height: 96vh;
-    overflow-y: auto;
-    /* solo aparece si la pantalla es muy baja */
-    padding: 28px 38px;
-    border-radius: 28px;
+    width: calc(340 * var(--u));
+    margin: 0 6vw 0 0;
+    padding: calc(22 * var(--u)) calc(27 * var(--u));
+    border-radius: calc(20 * var(--u));
     background-color: white;
     color: var(--color-texto);
 }
 
 .caja-titulo {
-    margin: 0 0 6px;
+    margin: 0 0 calc(5 * var(--u));
     text-align: center;
-    font-size: 32px;
+    font-size: calc(22 * var(--u));
     font-weight: 500;
     line-height: 1.2;
     color: var(--color-oscuro);
 }
 
 .caja-subtitulo {
-    margin: 0 0 14px;
-    font-size: 14px;
+    margin: 0 0 calc(14 * var(--u));
+    font-size: calc(10 * var(--u));
     line-height: 1.4;
     color: #6f7f7b;
 }
 
-/* ---------- Campos ---------- */
+/* campos */
 .bloque {
-    margin-bottom: 12px;
+    margin-bottom: calc(10 * var(--u));
 }
 
 .bloque label {
     display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
+    margin-bottom: calc(5 * var(--u));
+    font-size: calc(9.5 * var(--u));
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.25;
 }
 
-/* Dos campos lado a lado */
 .fila-dos {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: calc(10 * var(--u));
 }
 
 .campo-icono {
@@ -149,16 +140,14 @@
 
 .campo {
     width: 100%;
-    height: 46px;
-    /* alto de los campos */
-    padding: 0 14px 0 42px;
-    /* el espacio de la izquierda es para el icono */
+    height: calc(34 * var(--u));
+    padding: 0 calc(10 * var(--u)) 0 calc(26 * var(--u));
     border: 1px solid #dfece6;
-    border-radius: 12px;
+    border-radius: calc(9 * var(--u));
     background-color: var(--color-fondo);
     color: var(--color-texto);
     font-family: inherit;
-    font-size: 14px;
+    font-size: calc(9 * var(--u));
 }
 
 .campo::placeholder {
@@ -170,21 +159,19 @@
 }
 
 .campo-con-ojo {
-    padding-right: 42px;
-    /* espacio para el ojo */
+    padding-right: calc(24 * var(--u));
 }
 
 .campo-select {
     appearance: none;
-    /* quita la flecha del navegador */
-    padding-right: 40px;
+    padding-right: calc(30 * var(--u));
     cursor: pointer;
 }
 
-/* Iconos */
+/* iconos */
 .icono {
-    width: 18px;
-    height: 18px;
+    width: calc(12 * var(--u));
+    height: calc(12 * var(--u));
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -194,24 +181,24 @@
 
 .icono-izq {
     position: absolute;
-    left: 14px;
-    top: 14px;
+    left: calc(10 * var(--u));
+    top: calc(11 * var(--u));
     color: var(--color-icono-candado);
     pointer-events: none;
 }
 
 .icono-der {
     position: absolute;
-    right: 14px;
-    top: 14px;
+    right: calc(10 * var(--u));
+    top: calc(11 * var(--u));
     color: var(--color-icono-ojo);
     pointer-events: none;
 }
 
 .ver-clave {
     position: absolute;
-    right: 12px;
-    top: 14px;
+    right: calc(10 * var(--u));
+    top: calc(11 * var(--u));
     display: flex;
     padding: 0;
     border: none;
@@ -220,21 +207,21 @@
     cursor: pointer;
 }
 
-/* ---------- Política, botón y pie ---------- */
+/* política, botón y pie */
 .politica {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    margin: 4px 0 14px;
-    font-size: 13px;
-    line-height: 1.4;
+    gap: calc(6 * var(--u));
+    margin: calc(2 * var(--u)) 0 calc(11 * var(--u));
+    font-size: calc(9.5 * var(--u));
+    line-height: 1.5;
 }
 
 .politica input {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    margin: 1px 0 0;
+    width: calc(12 * var(--u));
+    height: calc(12 * var(--u));
+    margin: calc(1 * var(--u)) 0 0;
     accent-color: var(--color-principal);
 }
 
@@ -247,16 +234,15 @@
 .boton-registrar {
     display: inline-flex;
     align-items: center;
-    height: 48px;
-    padding: 0 30px;
+    height: calc(39 * var(--u));
+    padding: 0 calc(22 * var(--u));
     border: none;
     border-radius: 999px;
     background-color: var(--color-principal);
     color: var(--color-oscuro);
     font-family: inherit;
-    font-size: 16px;
+    font-size: calc(11.5 * var(--u));
     font-weight: 600;
-    text-decoration: none;
     cursor: pointer;
 }
 
@@ -266,20 +252,20 @@
 }
 
 .pie-caja {
-    margin: 14px 0 0;
+    margin: calc(14 * var(--u)) 0 0;
     text-align: center;
-    font-size: 13px;
-    line-height: 1.2;
+    font-size: calc(9 * var(--u));
+    line-height: 1.3;
 }
 
-/* Mensajes */
+/* avisos */
 .aviso-error,
 .aviso-exito {
-    margin-bottom: 14px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    margin-bottom: calc(10 * var(--u));
+    padding: calc(7 * var(--u)) calc(10 * var(--u));
+    border-radius: calc(9 * var(--u));
     background-color: white;
-    font-size: 14px;
+    font-size: calc(9.5 * var(--u));
 }
 
 .aviso-error {
@@ -292,7 +278,7 @@
     color: var(--color-icono-candado);
 }
 
-/* Popup de registro exitoso */
+/* popup de registro exitoso */
 .modal-fondo {
     position: fixed;
     inset: 0;
@@ -349,12 +335,48 @@
     text-decoration: none;
 }
 
-
-
-/* =====================================================
-   LAPTOPS (hasta 1400 px de ancho): todo un poco más pequeño
-   ===================================================== */
+/* laptops */
 @media (max-width: 1400px) {
+    .marca-logo {
+        height: 80px;
+    }
+
+    .marca-linea {
+        height: 64px;
+    }
+
+    .marca-nombre {
+        font-size: 16px;
+    }
+
+    .presentacion-titulo {
+        font-size: 34px;
+    }
+
+    .presentacion-texto {
+        max-width: 340px;
+        font-size: 15px;
+    }
+}
+
+/* tablet y celular: una columna, sin mascota y --u fijo */
+@media (max-width: 900px) {
+    .pantalla-registro {
+        --u: 1.5px;
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 24px;
+        padding: 16px 20px 32px;
+    }
+
+    .marca {
+        position: static;
+    }
+
     .marca-logo {
         height: 56px;
     }
@@ -364,180 +386,7 @@
     }
 
     .marca-nombre {
-        font-size: 14px;
-    }
-
-    .presentacion-titulo {
-        font-size: 32px;
-    }
-
-    .presentacion-texto {
-        max-width: 320px;
-        font-size: 15px;
-    }
-
-    .mascota-registro {
-        height: 58vh;
-    }
-
-    .caja-registro {
-        width: 420px;
-        padding: 22px 30px;
-    }
-
-    .caja-titulo {
-        font-size: 26px;
-    }
-
-    .caja-subtitulo {
-        margin-bottom: 10px;
         font-size: 13px;
-    }
-
-    .bloque {
-        margin-bottom: 10px;
-    }
-
-    .bloque label {
-        margin-bottom: 4px;
-        font-size: 12px;
-    }
-
-    .campo {
-        height: 40px;
-        font-size: 13px;
-    }
-
-    .icono-izq,
-    .icono-der,
-    .ver-clave {
-        top: 11px;
-    }
-
-    .politica {
-        font-size: 12px;
-    }
-
-    .boton-registrar {
-        height: 42px;
-        font-size: 15px;
-    }
-
-    .pie-caja {
-        margin-top: 10px;
-        font-size: 12px;
-    }
-}
-
-/* =====================================================
-   PANTALLAS BAJAS (poca altura): la tarjeta se compacta para que
-   todo el formulario se vea completo, sin hacer scroll.
-   ===================================================== */
-@media (max-height: 780px) {
-    .caja-registro {
-        padding: 18px 28px;
-    }
-
-    .caja-titulo {
-        margin-bottom: 4px;
-        font-size: 24px;
-    }
-
-    .caja-subtitulo {
-        margin-bottom: 8px;
-        font-size: 12px;
-    }
-
-    .bloque {
-        margin-bottom: 8px;
-    }
-
-    .bloque label {
-        margin-bottom: 3px;
-        font-size: 11.5px;
-    }
-
-    .campo {
-        height: 36px;
-        font-size: 12.5px;
-    }
-
-    .icono-izq,
-    .icono-der,
-    .ver-clave {
-        top: 9px;
-    }
-
-    .politica {
-        margin: 2px 0 10px;
-        font-size: 11.5px;
-    }
-
-    .boton-registrar {
-        height: 38px;
-        font-size: 14px;
-    }
-
-    .pie-caja {
-        margin-top: 8px;
-        font-size: 11.5px;
-    }
-}
-
-@media (max-height: 680px) {
-    .caja-registro {
-        padding: 14px 26px;
-    }
-
-    .caja-titulo {
-        font-size: 22px;
-    }
-
-    .caja-subtitulo {
-        margin-bottom: 6px;
-    }
-
-    .bloque {
-        margin-bottom: 6px;
-    }
-
-    .campo {
-        height: 33px;
-    }
-
-    .icono-izq,
-    .icono-der,
-    .ver-clave {
-        top: 7.5px;
-    }
-
-    .politica {
-        margin-bottom: 8px;
-    }
-
-    .boton-registrar {
-        height: 36px;
-    }
-}
-
-/* =====================================================
-   TABLET Y CELULAR (hasta 900 px): una sola columna, sin mascota
-   (aquí sí se puede bajar la pantalla)
-   ===================================================== */
-@media (max-width: 900px) {
-    .pantalla-registro {
-        height: auto;
-        min-height: 100vh;
-        overflow: visible;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        gap: 20px;
-        padding: 16px 20px 32px;
-    }
-
-    .marca {
-        position: static;
     }
 
     .presentacion,
@@ -548,13 +397,11 @@
     .caja-registro {
         width: 100%;
         max-width: 480px;
-        max-height: none;
         margin: 0 auto;
-        padding: 24px;
     }
 }
 
-/* Celulares: los pares de campos pasan a una sola columna */
+/* celular: los campos en pareja pasan a una columna */
 @media (max-width: 600px) {
     .fila-dos {
         grid-template-columns: 1fr;

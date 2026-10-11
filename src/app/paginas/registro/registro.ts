@@ -5,7 +5,6 @@ import { Programa } from '../../modelos';
 import { ServicioApi } from '../../servicios/servicio-api';
 import { ServicioAutenticacion } from '../../servicios/servicio-autenticacion';
 
-/** Registro del director académico. */
 @Component({
   selector: 'app-registro',
   imports: [ReactiveFormsModule, RouterLink],
@@ -21,7 +20,7 @@ export class Registro implements OnInit {
   registroExitoso = signal(false);
   cargando = signal(false);
 
-  // Ojos de las dos contraseñas
+  // ojos de las contraseñas
   claveVisible = signal(false);
   confirmarVisible = signal(false);
 
@@ -36,7 +35,7 @@ export class Registro implements OnInit {
     aceptaPolitica: new FormControl(false, { nonNullable: true }),
   });
 
-  /** Al abrir la página se cargan los programas para el selector. */
+  // carga los programas para el select
   ngOnInit(): void {
     this.servicioApi.obtener<Programa>('programas', 'select=id,nombre&order=nombre').subscribe({
       next: programas => this.programas.set(programas),
@@ -52,7 +51,7 @@ export class Registro implements OnInit {
     this.confirmarVisible.update(visible => !visible);
   }
 
-  /** Revisa lo básico y envía el registro. */
+  // valida y envía el registro
   enviarDatosFormulario(): void {
     this.mensajeError.set('');
     const v = this.formularioRegistro.getRawValue();

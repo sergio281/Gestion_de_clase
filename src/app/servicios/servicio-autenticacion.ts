@@ -5,21 +5,19 @@ import { ServicioApi } from './servicio-api';
 
 const CLAVE_ALMACENAMIENTO = 'sesion-salones';
 
-/** Maneja el inicio de sesión, el registro y los datos del usuario actual. */
 @Injectable({ providedIn: 'root' })
 export class ServicioAutenticacion {
   private servicioApi = inject(ServicioApi);
 
-  /** Perfil del usuario con sesión iniciada (null si no hay sesión). */
+  // null si no hay sesión
   perfilActual = signal<PerfilUsuario | null>(null);
 
   constructor() {
     this.restaurarSesion();
   }
 
-  /** Inicia sesión y devuelve el perfil (con su rol). */
+  // login: trae el token y después el perfil con el rol
   iniciarSesion(correo: string, clave: string): Observable<PerfilUsuario> {
-    // Aseguramos que el correo vaya siempre en minúsculas y sin espacios
     const correoLimpio = correo.trim().toLowerCase();
 
     return this.servicioApi.autenticar<RespuestaSesion>('token?grant_type=password', { email: correoLimpio, password: clave }).pipe(
@@ -38,7 +36,6 @@ export class ServicioAutenticacion {
     );
   }
 
-  /** Registra a un director académico. Puede iniciar sesión de inmediato. */
   registrarDirectorAcademico(datos: DatosRegistro): Observable<void> {
     const cuerpo = {
       email: datos.correo,
@@ -62,7 +59,7 @@ export class ServicioAutenticacion {
     localStorage.removeItem(CLAVE_ALMACENAMIENTO);
   }
 
-  /** Guarda la sesión para que no se pierda al recargar la página. */
+  // se guarda en localStorage para no perder la sesión al recargar
   private guardarSesion(perfil: PerfilUsuario): void {
     this.perfilActual.set(perfil);
     localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify({ token: this.servicioApi.tokenSesion, perfil }));

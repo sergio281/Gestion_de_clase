@@ -3,18 +3,14 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { entorno } from '../../entorno';
 
-/**
- * Servicio HTTP general. Todas las peticiones a Supabase pasan por aquí:
- * agrega las cabeceras necesarias y traduce los errores a mensajes legibles.
- */
+// todas las peticiones a supabase pasan por aquí
 @Injectable({ providedIn: 'root' })
 export class ServicioApi {
   private clienteHttp = inject(HttpClient);
 
-  /** Token de la sesión activa. Lo asigna el servicio de autenticación. */
+  // lo asigna el servicio de autenticación
   tokenSesion: string | null = null;
 
-  /** Cabeceras comunes: la clave pública y, si hay sesión, el token del usuario. */
   private crearEncabezados(devolverRegistros: boolean): HttpHeaders {
     let encabezados = new HttpHeaders({
       apikey: entorno.supabaseClave,
@@ -29,39 +25,36 @@ export class ServicioApi {
     return encabezados;
   }
 
-  /** Arma la dirección de una tabla con sus filtros, por ejemplo "estado=eq.pendiente". */
+  // filtros por ejemplo: "estado=eq.pendiente"
   private direccionTabla(tabla: string, filtros: string): string {
     return `${entorno.supabaseUrl}/rest/v1/${tabla}${filtros ? '?' + filtros : ''}`;
   }
 
-  /** Consulta registros de una tabla. */
   obtener<T>(tabla: string, filtros = ''): Observable<T[]> {
     return this.clienteHttp.get<T[]>(this.direccionTabla(tabla, filtros), { headers: this.crearEncabezados(false) });
   }
 
-  /** Crea un registro. */
-  crear<T>(tabla: string, cuerpo: unknown): Observable<T[]> {
-    return this.clienteHttp.post<T[]>(this.direccionTabla(tabla, ''), cuerpo, { headers: this.crearEncabezados(true) });
+  // preferencia sirve para ignorar repetidos
+  crear<T>(tabla: string, cuerpo: unknown, filtros = '', preferencia = 'return=representation'): Observable<T[]> {
+    const encabezados = this.crearEncabezados(true).set('Prefer', preferencia);
+    return this.clienteHttp.post<T[]>(this.direccionTabla(tabla, filtros), cuerpo, { headers: encabezados });
   }
 
-  /** Modifica los registros que cumplan el filtro. */
   actualizar<T>(tabla: string, filtros: string, cuerpo: unknown): Observable<T[]> {
     return this.clienteHttp.patch<T[]>(this.direccionTabla(tabla, filtros), cuerpo, { headers: this.crearEncabezados(true) });
   }
 
-  /** Elimina los registros que cumplan el filtro. */
   eliminar(tabla: string, filtros: string): Observable<unknown> {
     return this.clienteHttp.delete(this.direccionTabla(tabla, filtros), { headers: this.crearEncabezados(false) });
   }
 
-  /** Llama al servicio de autenticación de Supabase (inicio de sesión y registro). */
+  // login y registro
   autenticar<T>(ruta: string, cuerpo: unknown): Observable<T> {
     const encabezados = new HttpHeaders({ apikey: entorno.supabaseClave, 'Content-Type': 'application/json' });
     return this.clienteHttp.post<T>(`${entorno.supabaseUrl}/auth/v1/${ruta}`, cuerpo, { headers: encabezados });
   }
 
-  /** Convierte cualquier error en un mensaje claro para mostrar al usuario. */
-  /** Convierte cualquier error en un mensaje claro, siempre en español. */
+  // errores en español
   obtenerMensajeError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0) return 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
@@ -86,7 +79,7 @@ export class ServicioApi {
       };
       if (mensajesPorCodigo[codigo]) return mensajesPorCodigo[codigo];
 
-      // Respaldo: se busca el texto del error cuando no viene un código conocido
+      // si no hay código conocido se busca en el texto
       const texto = `${cuerpo?.msg ?? ''} ${cuerpo?.message ?? ''} ${cuerpo?.error_description ?? ''}`.toLowerCase();
       if (texto.includes('database error')) return 'No se pudo crear la cuenta: revisa que el correo y el documento no estén repetidos.';
       if (texto.includes('duplicate key')) return 'Ya existe un registro con ese valor (por ejemplo, el documento o el correo).';
