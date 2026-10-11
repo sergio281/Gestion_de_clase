@@ -6,8 +6,8 @@ const SERVICE_ID = 'service_cg719jq';
 const TEMPLATE_ID = 'template_mvwj92s';
 const PUBLIC_KEY = '3VxMvN_G8EhKc4N_7';
 
-// plantilla para los correos de rechazo (pon aquí tu ID nuevo)
-export const PLANTILLA_RECHAZO = 'template_abc123';
+// plantilla para los correos de rechazo 
+export const PLANTILLA_RECHAZO = 'template_0m6gkkh';
 
 // emailjs rechaza envíos muy seguidos
 const PAUSA_ENTRE_CORREOS_MS = 1200;
