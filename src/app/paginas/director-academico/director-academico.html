@@ -1,7 +1,141 @@
-<main style="padding: 24px">
-    <h1>Panel del director académico</h1>
-    @if (perfil(); as p) {
-    <p>Bienvenido, {{ p.nombre }} ({{ p.rol }})</p>
+<div class="panel-director">
+
+    <header class="encabezado-panel">
+        <div class="fila-superior">
+            <h1 class="titulo-panel">Aulas Guarinó</h1>
+            <div class="datos-usuario">
+                <span class="texto-usuario">{{ nombreUsuario() }} · director</span>
+                <button type="button" class="boton-salir" (click)="salir()">salir</button>
+            </div>
+        </div>
+
+        <nav class="pestanas-panel" aria-label="Secciones del panel">
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'clases'"
+                (click)="cambiarVista('clases')">Mis clases y solicitudes</button>
+            <button type="button" class="pestana" [class.pestana-activa]="vista() === 'nueva'"
+                (click)="cambiarVista('nueva')">Nueva solicitud</button>
+        </nav>
+    </header>
+
+    <!-- mis clases y solicitudes -->
+    @if (vista() === 'clases') {
+    <main class="tarjeta-director">
+        <h2 class="titulo-tarjeta">Mis clases y solicitudes</h2>
+
+        @if (mensaje(); as m) {
+        <p class="mensaje" [class.mensaje-exito]="m.tipo === 'exito'"
+            [class.mensaje-advertencia]="m.tipo === 'advertencia'" role="status">{{ m.texto }}</p>
+        }
+
+        <div class="contenedor-tabla">
+            <table class="tabla-clases">
+                <thead>
+                    <tr>
+                        <th>Materia</th>
+                        <th>Fechas y horario</th>
+                        <th>Aula</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (reserva of reservas(); track reserva.id) {
+                    <tr>
+                        <td>{{ reserva.asignatura }}</td>
+                        <td>
+                            <span class="linea-fechas">{{ textoFechas(reserva) }}</span>
+                            <span class="linea-horario">{{ textoDias(reserva) }} · {{ reserva.hora_inicio }}:00–{{
+                                reserva.hora_fin }}:00</span>
+                        </td>
+                        <td>{{ reserva.salon_id ? nombreAula(reserva.salon_id) : '—' }}</td>
+                        <td>
+                            <span class="insignia-estado" [class.estado-aprobada]="reserva.estado === 'aprobada'"
+                                [class.estado-pendiente]="reserva.estado === 'pendiente'">{{ reserva.estado }}</span>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="4">Aún no tienes clases ni solicitudes.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
     }
-    <button type="button" (click)="salir()">Cerrar sesión</button>
-</main>
+
+    <!-- nueva solicitud -->
+    @if (vista() === 'nueva') {
+    <main class="tarjeta-director tarjeta-formulario">
+        <h2 class="titulo-formulario">Nueva solicitud</h2>
+
+        <div class="campos-formulario" [formGroup]="formularioSolicitud">
+            <label class="etiqueta-formulario" for="asignatura">Asignatura</label>
+            <input id="asignatura" class="campo-formulario" formControlName="asignatura" placeholder="Ej.Cálculo II">
+
+            <label class="etiqueta-formulario" for="programa">Programa</label>
+            <select id="programa" class="campo-formulario" formControlName="programaId">
+                <option [ngValue]="null">Selecciona un programa</option>
+                @for (programa of programas(); track programa.id) {
+                <option [ngValue]="programa.id">{{ programa.nombre }}</option>
+                }
+            </select>
+
+            <label class="etiqueta-formulario" for="equipo">Equipos a adquirir</label>
+            <select id="equipo" class="campo-formulario" formControlName="equipo">
+                <option value="">Ninguno</option>
+                @for (nombre of nombresEquipos(); track nombre) {
+                <option [value]="nombre">{{ nombre }}</option>
+                }
+            </select>
+
+            <div class="fila-dos-campos">
+                <div>
+                    <label class="etiqueta-formulario" for="desde">Fecha (desde)</label>
+                    <input id="desde" class="campo-formulario" type="date" formControlName="fechaInicio">
+                </div>
+                <div>
+                    <label class="etiqueta-formulario" for="hasta">Fecha (hasta)</label>
+                    <input id="hasta" class="campo-formulario" type="date" formControlName="fechaFin">
+                </div>
+            </div>
+
+            <span class="etiqueta-formulario">Días de la semana</span>
+            <div class="grupo-dias">
+                @for (dia of abreviaturasDias; track $index) {
+                <label class="casilla-dia">
+                    <input type="checkbox" [checked]="dias().includes($index)" (change)="alternarDia($index)">
+                    {{ dia }}
+                </label>
+                }
+            </div>
+
+            <div class="fila-dos-campos">
+                <div>
+                    <label class="etiqueta-formulario" for="inicio">Horario de inicio</label>
+                    <select id="inicio" class="campo-formulario" formControlName="horaInicio">
+                        @for (hora of horasInicio; track hora) {
+                        <option [ngValue]="hora">{{ hora }}:00</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="etiqueta-formulario" for="fin">Horario de final</label>
+                    <select id="fin" class="campo-formulario" formControlName="horaFin">
+                        @for (hora of horasFin; track hora) {
+                        <option [ngValue]="hora">{{ hora }}:00</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @if (advertencia()) {
+        <p class="mensaje mensaje-advertencia" role="alert">{{ advertencia() }}</p>
+        }
+
+        <button type="button" class="boton-enviar" [disabled]="guardando()" (click)="enviarSolicitud()">
+            {{ guardando() ? 'Enviando...' : 'Enviar solicitud' }}
+        </button>
+    </main>
+    }
+</div>
