@@ -25,7 +25,8 @@ export class ServicioHorarios {
   async cargarDatos(): Promise<DatosPanel> {
     const api = this.servicioApi;
     const [salones, reservas, programas, directores, estudiantes, equipos] = await Promise.all([
-      firstValueFrom(api.obtener<Salon>('salones', 'select=*&order=id')),
+      // la tabla en Supabase se llama "aulas"
+      firstValueFrom(api.obtener<Salon>('aulas', 'select=*&order=id')),
       firstValueFrom(api.obtener<Reserva>('reservas', 'select=*&order=fecha_inicio')),
       firstValueFrom(api.obtener<Programa>('programas', 'select=*&order=nombre')),
       firstValueFrom(api.obtener<PerfilUsuario>('perfiles', 'select=*&rol=eq.director-academico&order=nombre')),
@@ -51,18 +52,18 @@ export class ServicioHorarios {
     await firstValueFrom(this.servicioApi.eliminar('reservas', `id=eq.${id}`));
   }
 
-  // salones
+  // aulas
 
   async crearSalon(salon: Omit<Salon, 'id'>): Promise<void> {
-    await firstValueFrom(this.servicioApi.crear('salones', salon));
+    await firstValueFrom(this.servicioApi.crear('aulas', salon));
   }
 
   async actualizarSalon(id: number, cambios: Partial<Salon>): Promise<void> {
-    await firstValueFrom(this.servicioApi.actualizar('salones', `id=eq.${id}`, cambios));
+    await firstValueFrom(this.servicioApi.actualizar('aulas', `id=eq.${id}`, cambios));
   }
 
   async eliminarSalon(id: number): Promise<void> {
-    await firstValueFrom(this.servicioApi.eliminar('salones', `id=eq.${id}`));
+    await firstValueFrom(this.servicioApi.eliminar('aulas', `id=eq.${id}`));
   }
 
   // directores (perfiles con rol director-academico)
