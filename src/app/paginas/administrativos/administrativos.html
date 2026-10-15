@@ -47,11 +47,7 @@
     <main class="tarjeta-matriz">
 
         <div class="encabezado-tarjeta">
-<<<<<<< HEAD
-            <h2 class="titulo-tarjeta">Ocupación de Aulas</h2>
-=======
             <h2 class="titulo-tarjeta">Ocupación de aulas</h2>
->>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
 
             <div class="selector-fecha">
                 <button type="button" class="boton-flecha" (click)="moverFecha(-1)"
@@ -194,11 +190,7 @@
     <main class="tarjeta-matriz">
         <div class="encabezado-tarjeta">
             <h2 class="titulo-tarjeta">Aulas y dotación</h2>
-<<<<<<< HEAD
-            <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nueva Aula</button>
-=======
             <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nueva aula</button>
->>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
         </div>
 
         <p class="subtitulo-tarjeta">NG = sin dotación · TV = televisor · Py = proyector · Inf. = sala de informática
@@ -245,11 +237,7 @@
                     </tr>
                     } @empty {
                     <tr>
-<<<<<<< HEAD
-                        <td colspan="4">No hay aulas registrados.</td>
-=======
                         <td colspan="4">No hay aulas registradas.</td>
->>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
                     </tr>
                     }
                 </tbody>
@@ -516,11 +504,7 @@
     </div>
     }
 
-<<<<<<< HEAD
     <!-- formulario de aula: nuevo / editar -->
-=======
-    <!-- formulario de aula: nueva / editar -->
->>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
     @if (formularioSalonAbierto(); as abiertoSalon) {
     <div class="fondo-ventana" (click)="cerrarFormularioSalon()">
         <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
@@ -561,11 +545,7 @@
     <div class="fondo-ventana" (click)="salonAEliminar.set(null)">
         <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
             <h3 class="titulo-detalle">Confirmar acción</h3>
-<<<<<<< HEAD
-            <p class="texto-detalle">¿Eliminar la aula {{ salon.nombre || '--' }}?</p>
-=======
             <p class="texto-detalle">¿Eliminar el aula {{ salon.nombre || '--' }}?</p>
->>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
             <div class="botones-ventana">
                 <button type="button" class="boton-cancelar" (click)="salonAEliminar.set(null)">Cancelar</button>
                 <button type="button" class="boton-confirmar" [disabled]="guardando()"
