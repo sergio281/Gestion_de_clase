@@ -72,7 +72,7 @@ export class DirectorAcademico implements OnInit {
         firstValueFrom(this.servicioApi.obtener<Reserva>(
           'reservas', `select=*&director_id=eq.${perfil.id}&order=fecha_inicio.desc`)),
         // la tabla en la base de datos se sigue llamando "salones"
-        firstValueFrom(this.servicioApi.obtener<Salon>('salones', 'select=*&order=id')),
+        firstValueFrom(this.servicioApi.obtener<Salon>('aulas', 'select=*&order=id')),
         firstValueFrom(this.servicioApi.obtener<Programa>('programas', 'select=*&order=nombre')),
         firstValueFrom(this.servicioApi.obtener<Equipo>('equipos', 'select=*&order=nombre')),
       ]);

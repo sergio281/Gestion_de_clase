@@ -29,7 +29,6 @@
             </div>
         </div>
 
-        <!-- por ahora solo funciona la matriz, las demás pestañas quedan deshabilitadas -->
         <nav class="pestanas-panel" aria-label="Secciones del panel">
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'matriz'"
                 (click)="cambiarVista('matriz')">Matriz de horarios</button>
@@ -48,7 +47,11 @@
     <main class="tarjeta-matriz">
 
         <div class="encabezado-tarjeta">
+<<<<<<< HEAD
             <h2 class="titulo-tarjeta">Ocupación de Aulas</h2>
+=======
+            <h2 class="titulo-tarjeta">Ocupación de aulas</h2>
+>>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
 
             <div class="selector-fecha">
                 <button type="button" class="boton-flecha" (click)="moverFecha(-1)"
@@ -146,7 +149,7 @@
                         <td>{{ solicitud.asignatura }}</td>
                         <td>{{ textoReserva(solicitud) }} · {{ solicitud.hora_inicio }}:00 - {{ solicitud.hora_fin }}:00
                         </td>
-                        <td>{{ solicitud.necesidad }}</td>
+                        <td>{{ solicitud.necesidad || '--' }}</td>
                         <td class="acciones-solicitud">
                             <div class="botones-solicitud">
                                 <button type="button" class="boton-confirmar" [disabled]="guardando()"
@@ -174,7 +177,7 @@
         </div>
     </main>
 
-    <!-- lista de salones: el fondo transparente sirve para cerrarla al hacer clic afuera -->
+    <!-- lista de aulas: el fondo transparente sirve para cerrarla al hacer clic afuera -->
     @if (listaSalones(); as lista) {
     <div class="fondo-lista" (click)="cerrarLista()"></div>
     <ul class="lista-salones" role="listbox" [style.top.px]="lista.top" [style.left.px]="lista.left"
@@ -186,12 +189,16 @@
     }
     }
 
-    <!-- salones y dotación -->
+    <!-- aulas y dotación -->
     @if (vista() === 'salones') {
     <main class="tarjeta-matriz">
         <div class="encabezado-tarjeta">
             <h2 class="titulo-tarjeta">Aulas y dotación</h2>
+<<<<<<< HEAD
             <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nueva Aula</button>
+=======
+            <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nueva aula</button>
+>>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
         </div>
 
         <p class="subtitulo-tarjeta">NG = sin dotación · TV = televisor · Py = proyector · Inf. = sala de informática
@@ -238,7 +245,11 @@
                     </tr>
                     } @empty {
                     <tr>
+<<<<<<< HEAD
                         <td colspan="4">No hay aulas registrados.</td>
+=======
+                        <td colspan="4">No hay aulas registradas.</td>
+>>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
                     </tr>
                     }
                 </tbody>
@@ -289,7 +300,7 @@
                         </td>
                         <td>--</td>
                         <td class="acciones-salon">
-                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <!-- se reutilizan los estilos de los botones de aulas -->
                             <button type="button" class="boton-editar-salon"
                                 (click)="abrirFormularioEquipoEditar(equipo)">Editar</button>
                             <button type="button" class="boton-eliminar-salon"
@@ -349,7 +360,7 @@
                                 estadoDirector(director) }}</span>
                         </td>
                         <td class="acciones-salon">
-                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <!-- se reutilizan los estilos de los botones de aulas -->
                             <button type="button" class="boton-editar-salon"
                                 (click)="abrirFormularioDirector(director)">Editar</button>
                             <button type="button" class="boton-eliminar-salon"
@@ -505,7 +516,11 @@
     </div>
     }
 
+<<<<<<< HEAD
     <!-- formulario de aula: nuevo / editar -->
+=======
+    <!-- formulario de aula: nueva / editar -->
+>>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
     @if (formularioSalonAbierto(); as abiertoSalon) {
     <div class="fondo-ventana" (click)="cerrarFormularioSalon()">
         <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
@@ -546,7 +561,11 @@
     <div class="fondo-ventana" (click)="salonAEliminar.set(null)">
         <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
             <h3 class="titulo-detalle">Confirmar acción</h3>
+<<<<<<< HEAD
             <p class="texto-detalle">¿Eliminar la aula {{ salon.nombre || '--' }}?</p>
+=======
+            <p class="texto-detalle">¿Eliminar el aula {{ salon.nombre || '--' }}?</p>
+>>>>>>> bc524ff4fd2859b8bc3dbf404385e41960448efc
             <div class="botones-ventana">
                 <button type="button" class="boton-cancelar" (click)="salonAEliminar.set(null)">Cancelar</button>
                 <button type="button" class="boton-confirmar" [disabled]="guardando()"
