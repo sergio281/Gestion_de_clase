@@ -12,11 +12,11 @@ import {
 // cualquier correo con formato válido (algo@dominio.ext)
 const FORMATO_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// plantas que siempre aparecen en el formulario de salones 
+// plantas que siempre aparecen en el formulario de aulas
 const PLANTAS_BASE = ['1', '2'];
 
 // Supabase responde "ok" aunque las políticas (RLS) no dejen modificar la tabla
-const MENSAJE_PERMISOS = 'Supabase no aplicó el cambio: revisa los permisos (RLS) de la tabla salones.';
+const MENSAJE_PERMISOS = 'Supabase no aplicó el cambio: revisa los permisos (RLS) de la tabla aulas.';
 
 const MENSAJE_PERMISOS_EQUIPOS = 'Supabase no aplicó el cambio: revisa los permisos (RLS) de la tabla equipos.';
 
@@ -36,7 +36,7 @@ const ESTADOS_DIRECTOR: ('activo' | 'inactivo')[] = ['activo', 'inactivo'];
 // pestañas del panel
 type Vista = 'matriz' | 'solicitudes' | 'salones' | 'equipos' | 'directores';
 
-// alto que necesita la lista de salones
+// alto que necesita la lista de aulas
 const ALTO_LISTA = 280;
 
 // "TV, Py" -> ['TV', 'Py']; vacío o "NG" significa sin dotación
@@ -102,7 +102,7 @@ interface FormularioSalonAbierto {
   salonId: number | null;
 }
 
-// lista de salones
+// lista de aulas
 interface ListaSalones {
   solicitud: Reserva;
   top: number;
@@ -151,7 +151,7 @@ export class Administrativos implements OnInit {
   vista = signal<Vista>('matriz');
   solicitudARechazar = signal<Reserva | null>(null);
 
-  // sección de salones: formulario nuevo/editar y salón que está por eliminarse
+  // sección de aulas: formulario nueva/editar y aula que está por eliminarse
   formularioSalonAbierto = signal<FormularioSalonAbierto | null>(null);
   salonAEliminar = signal<Salon | null>(null);
   advertenciaSalon = signal('');
@@ -169,7 +169,7 @@ export class Administrativos implements OnInit {
   equipoAEliminar = signal<Equipo | null>(null);
   advertenciaEquipo = signal('');
 
-  // lista de salones desplegada en la pestaña de solicitudes (null = cerrada)
+  // lista de aulas desplegada en la pestaña de solicitudes (null = cerrada)
   listaSalones = signal<ListaSalones | null>(null);
 
   // guarda la materia que se está arrastrando
@@ -208,7 +208,7 @@ export class Administrativos implements OnInit {
   nombreUsuario = computed(() => this.servicioAutenticacion.perfilActual()?.nombre ?? 'Administrador');
   asignaciones = computed(() => this.reservas().filter(r => r.estado === 'aprobada').length);
   solicitudesPendientes = computed(() => this.reservas().filter(r => r.estado === 'pendiente').length);
-  // plantas base más cualquier otra que ya exista en los salones
+  // plantas base más cualquier otra que ya exista en las aulas
   plantas = computed(() => [...new Set([
     ...PLANTAS_BASE,
     ...this.salones().map(s => String(s.planta ?? '')).filter(Boolean),
@@ -263,11 +263,13 @@ export class Administrativos implements OnInit {
     this.enrutador.navigate(['/inicio']);
   }
 
-  // cerar sesion
+  // cambiar de pestaña
   cambiarVista(vista: Vista): void {
     this.cerrarLista();
     this.mensajes.set([]);
     this.vista.set(vista);
+    // al entrar a Solicitudes se recargan los datos para ver las nuevas
+    if (vista === 'solicitudes') void this.cargarDatos();
   }
 
   // fechas
@@ -287,7 +289,7 @@ export class Administrativos implements OnInit {
     return this.estudiantes().filter(e => e.programa_id === programaId).length;
   }
 
-  // salones
+  // aulas
 
   // motivo error de Supabase (HttpErrorResponse) 
   private motivoDelError(error: unknown, porDefecto: string): string {
@@ -330,12 +332,12 @@ export class Administrativos implements OnInit {
     const valores = this.formularioSalon.getRawValue();
 
     const nombre = valores.nombre.trim();
-    if (!nombre) { this.advertenciaSalon.set('Escribe el nombre del salón.'); return; }
+    if (!nombre) { this.advertenciaSalon.set('Escribe el nombre del aula.'); return; }
     if (!valores.planta) { this.advertenciaSalon.set('Elige la planta.'); return; }
 
     const repetido = this.salones().some(s =>
       s.id !== abierto.salonId && (s.nombre ?? '').trim().toLowerCase() === nombre.toLowerCase());
-    if (repetido) { this.advertenciaSalon.set(`Ya existe un salón llamado ${nombre}.`); return; }
+    if (repetido) { this.advertenciaSalon.set(`Ya existe un aula llamada ${nombre}.`); return; }
 
     const datos = { nombre, planta: valores.planta, dotacion: extraerDotacion(valores.dotacion) };
 
@@ -356,17 +358,17 @@ export class Administrativos implements OnInit {
       this.cerrarFormularioSalon();
       this.mensajes.set([{
         tipo: 'exito',
-        texto: abierto.modo === 'crear' ? `Salón ${nombre} creado.` : `Salón ${nombre} actualizado.`,
+        texto: abierto.modo === 'crear' ? `Aula ${nombre} creada.` : `Aula ${nombre} actualizada.`,
       }]);
     } catch (error) {
-      this.advertenciaSalon.set(this.motivoDelError(error, 'No se pudo guardar el salón.'));
+      this.advertenciaSalon.set(this.motivoDelError(error, 'No se pudo guardar el aula.'));
     } finally {
       this.guardando.set(false);
     }
   }
 
   async eliminarSalon(salon: Salon): Promise<void> {
-    // un salón con asignaciones o solicitudes no se puede borrar
+    // un aula con asignaciones o solicitudes no se puede borrar
     const enUso = this.reservas().filter(r => r.salon_id === salon.id).length;
     if (enUso > 0) {
       this.salonAEliminar.set(null);
@@ -383,12 +385,12 @@ export class Administrativos implements OnInit {
       this.salonAEliminar.set(null);
       await this.cargarDatos();
 
-      // salón sigue en la lista, la base de datos no lo borró
+      // el aula sigue en la lista, la base de datos no la borró
       if (this.salones().some(s => s.id === salon.id)) throw new Error(MENSAJE_PERMISOS);
-      this.mensajes.set([{ tipo: 'exito', texto: `Salón ${salon.nombre || '--'} eliminado.` }]);
+      this.mensajes.set([{ tipo: 'exito', texto: `Aula ${salon.nombre || '--'} eliminada.` }]);
     } catch (error) {
       this.salonAEliminar.set(null);
-      this.mensajes.set([{ tipo: 'advertencia', texto: this.motivoDelError(error, 'No se pudo eliminar el salón.') }]);
+      this.mensajes.set([{ tipo: 'advertencia', texto: this.motivoDelError(error, 'No se pudo eliminar el aula.') }]);
     } finally {
       this.guardando.set(false);
     }
@@ -680,9 +682,9 @@ export class Administrativos implements OnInit {
     const directorId = this.directorDelPrograma(programa.id);
 
     // al editar se pasa el id para que no se cruce consigo misma
-    // solo bloquea si el salón ya está ocupado por otra asignación
+    // solo bloquea si el aula ya está ocupada por otra asignación
     if (this.salonOcupado(abierto.salon.id, { ...horario, id: abierto.reservaId ?? 0 })) {
-      this.advertencia.set(`El salón ${abierto.salon.nombre} ya está ocupado en parte de ese horario.`);
+      this.advertencia.set(`El aula ${abierto.salon.nombre} ya está ocupada en parte de ese horario.`);
       return false;
     }
 
@@ -749,7 +751,7 @@ export class Administrativos implements OnInit {
       this.mensajes.set(avisos);
 
       // los correos se mandan después de guardar, si fallan la materia ya quedó
-      const asunto = abierto.modo === 'crear' ? 'Salón asignado' : 'Cambio en tu asignación de salón';
+      const asunto = abierto.modo === 'crear' ? 'Aula asignada' : 'Cambio en tu asignación de aula';
       const avisosDeCorreo = await this.notificarPorCorreo(materia, asunto, correoProfesor);
       this.mensajes.update(actuales => [...actuales, ...avisosDeCorreo]);
     } catch (error) {
@@ -825,7 +827,7 @@ export class Administrativos implements OnInit {
 
   // solicitudes
 
-  // menú de salones propio (lista) 
+  // menú de aulas propio (lista) 
   alternarLista(evento: Event, solicitud: Reserva): void {
 
     if (this.listaSalones()?.solicitud.id === solicitud.id) {
@@ -852,13 +854,13 @@ export class Administrativos implements OnInit {
     this.listaSalones.set(null);
   }
 
-  // al elegir un salón  la lista se aprueba la solicitud ahí y aparece en la matriz
+  // al elegir un aula en la lista se aprueba la solicitud ahí y aparece en la matriz
   elegirSalon(solicitud: Reserva, salonId: number): void {
     this.cerrarLista();
     this.aprobarSolicitud(solicitud, salonId);
   }
 
-  // verificar si el salón esté libre mismas fechas, algún día en común y horas que se pisan
+  // verificar si el aula está libre: mismas fechas, algún día en común y horas que se pisan
   private salonOcupado(
     salonId: number,
     solicitud: Pick<Reserva, 'fecha_inicio' | 'fecha_fin' | 'dias' | 'hora_inicio' | 'hora_fin'> & { id?: number },
@@ -889,7 +891,7 @@ export class Administrativos implements OnInit {
     this.formularioAbierto.set({ modo: 'editar', salon, reservaId: reserva.id });
   }
 
-  // si llega salonId usa ese salón; si no, toma el primero sin cruces (no envía correos)
+  // si llega salonId usa esa aula; si no, toma la primera sin cruces (no envía correos)
   async aprobarSolicitud(reserva: Reserva, salonId?: number): Promise<void> {
     let salon: Salon | undefined;
 
@@ -897,13 +899,13 @@ export class Administrativos implements OnInit {
       salon = this.salones().find(s => s.id === salonId);
       if (!salon) return;
       if (this.salonOcupado(salon.id, reserva)) {
-        this.mensajes.set([{ tipo: 'advertencia', texto: `El salón ${salon.nombre} ya está ocupado en parte de ese horario.` }]);
+        this.mensajes.set([{ tipo: 'advertencia', texto: `El aula ${salon.nombre} ya está ocupada en parte de ese horario.` }]);
         return;
       }
     } else {
       salon = this.salones().find(s => !buscarCruce(this.reservas(), { ...reserva, salon_id: s.id }, reserva.id));
       if (!salon) {
-        this.mensajes.set([{ tipo: 'advertencia', texto: 'No se pudo asignar: no hay salón libre o hay un cruce en ese horario.' }]);
+        this.mensajes.set([{ tipo: 'advertencia', texto: 'No se pudo asignar: no hay aula libre o hay un cruce en ese horario.' }]);
         return;
       }
     }
@@ -913,7 +915,7 @@ export class Administrativos implements OnInit {
       await this.servicioHorarios.actualizarReserva(reserva.id, { salon_id: salon.id, estado: 'aprobada' });
       await this.cargarDatos();
       // no se envía ningún correo: para notificar se usa el lápiz de la asignación en la matriz
-      this.mensajes.set([{ tipo: 'exito', texto: `Solicitud «${reserva.asignatura}» aprobada en el salón ${salon.nombre}.` }]);
+      this.mensajes.set([{ tipo: 'exito', texto: `Solicitud «${reserva.asignatura}» aprobada en el aula ${salon.nombre}.` }]);
     } catch (error) {
       const motivo = (error as { message?: string })?.message;
       this.mensajes.set([{ tipo: 'advertencia', texto: 'No se pudo aprobar la solicitud.' + (motivo ? ` (${motivo})` : '') }]);
@@ -942,7 +944,7 @@ export class Administrativos implements OnInit {
         asunto: `Solicitud rechazada: ${reserva.asignatura}`,
         asignatura: reserva.asignatura,
         programa: this.nombrePrograma(reserva.programa_id),
-        salon: 'Sin salón asignado',
+        salon: 'Sin aula asignada',
         profesor: correo,
         fecha_inicio: darFormatoFecha(reserva.fecha_inicio),
         fecha_fin: darFormatoFecha(reserva.fecha_fin),

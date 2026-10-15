@@ -3,7 +3,7 @@
     <header class="encabezado-panel">
 
         <div class="fila-superior">
-            <h1 class="titulo-panel">Salones Guarinó</h1>
+            <h1 class="titulo-panel">Aulas Guarinó</h1>
             <div class="datos-usuario">
                 <span class="texto-usuario">{{ nombreUsuario() }} · admin</span>
                 <button type="button" class="boton-salir" (click)="cerrarSesion()">Salir</button>
@@ -13,7 +13,7 @@
         <div class="estadisticas">
             <div class="estadistica">
                 <span class="numero-estadistica">{{ salones().length }}</span>
-                <span class="etiqueta-estadistica">Salones</span>
+                <span class="etiqueta-estadistica">Aulas</span>
             </div>
             <div class="estadistica">
                 <span class="numero-estadistica">{{ asignaciones() }}</span>
@@ -29,14 +29,13 @@
             </div>
         </div>
 
-        <!-- por ahora solo funciona la matriz, las demás pestañas quedan deshabilitadas -->
         <nav class="pestanas-panel" aria-label="Secciones del panel">
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'matriz'"
                 (click)="cambiarVista('matriz')">Matriz de horarios</button>
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'solicitudes'"
                 (click)="cambiarVista('solicitudes')">Solicitudes</button>
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'salones'"
-                (click)="cambiarVista('salones')">Salones</button>
+                (click)="cambiarVista('salones')">Aulas</button>
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'equipos'"
                 (click)="cambiarVista('equipos')">Equipos</button>
             <button type="button" class="pestana" [class.pestana-activa]="vista() === 'directores'"
@@ -48,7 +47,7 @@
     <main class="tarjeta-matriz">
 
         <div class="encabezado-tarjeta">
-            <h2 class="titulo-tarjeta">Ocupación de salones</h2>
+            <h2 class="titulo-tarjeta">Ocupación de aulas</h2>
 
             <div class="selector-fecha">
                 <button type="button" class="boton-flecha" (click)="moverFecha(-1)"
@@ -62,7 +61,7 @@
         </div>
 
         <p class="subtitulo-tarjeta">{{ nombreDiaActual() }} {{ fechaFormateada() }} · Pulsa una celda libre para
-            asignar un salón o pulsa una asignación para ver o eliminarla</p>
+            asignar un aula o pulsa una asignación para ver o eliminarla</p>
 
         <!-- mensajes de éxito, info o advertencia -->
         @if (mensajes().length) {
@@ -75,12 +74,12 @@
         </div>
         }
 
-        <!-- una fila por salón, una columna por hora -->
+        <!-- una fila por aula, una columna por hora -->
         <div class="contenedor-tabla">
             <table class="tabla-matriz">
                 <thead>
                     <tr>
-                        <th class="columna-salon">Salón</th>
+                        <th class="columna-salon">Aula</th>
                         @for (hora of horasTabla; track hora) {
                         <th class="encabezado-hora">{{ hora }}:00</th>
                         }
@@ -146,7 +145,7 @@
                         <td>{{ solicitud.asignatura }}</td>
                         <td>{{ textoReserva(solicitud) }} · {{ solicitud.hora_inicio }}:00 - {{ solicitud.hora_fin }}:00
                         </td>
-                        <td>{{ solicitud.necesidad }}</td>
+                        <td>{{ solicitud.necesidad || '--' }}</td>
                         <td class="acciones-solicitud">
                             <div class="botones-solicitud">
                                 <button type="button" class="boton-confirmar" [disabled]="guardando()"
@@ -160,7 +159,7 @@
                                 aria-haspopup="listbox"
                                 [attr.aria-expanded]="listaSalones()?.solicitud?.id === solicitud.id"
                                 (click)="alternarLista($event, solicitud)">
-                                Seleccionar salón ▾
+                                Seleccionar aula ▾
                             </button>
                         </td>
                     </tr>
@@ -174,7 +173,7 @@
         </div>
     </main>
 
-    <!-- lista de salones: el fondo transparente sirve para cerrarla al hacer clic afuera -->
+    <!-- lista de aulas: el fondo transparente sirve para cerrarla al hacer clic afuera -->
     @if (listaSalones(); as lista) {
     <div class="fondo-lista" (click)="cerrarLista()"></div>
     <ul class="lista-salones" role="listbox" [style.top.px]="lista.top" [style.left.px]="lista.left"
@@ -186,12 +185,12 @@
     }
     }
 
-    <!-- salones y dotación -->
+    <!-- aulas y dotación -->
     @if (vista() === 'salones') {
     <main class="tarjeta-matriz">
         <div class="encabezado-tarjeta">
-            <h2 class="titulo-tarjeta">Salones y dotación</h2>
-            <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nuevo salón</button>
+            <h2 class="titulo-tarjeta">Aulas y dotación</h2>
+            <button type="button" class="boton-hoy" (click)="abrirFormularioSalonNuevo()">Nueva aula</button>
         </div>
 
         <p class="subtitulo-tarjeta">NG = sin dotación · TV = televisor · Py = proyector · Inf. = sala de informática
@@ -211,7 +210,7 @@
             <table class="tabla-salones">
                 <thead>
                     <tr>
-                        <th>Salón</th>
+                        <th>Aula</th>
                         <th>Planta</th>
                         <th>Dotación</th>
                         <th></th>
@@ -238,7 +237,7 @@
                     </tr>
                     } @empty {
                     <tr>
-                        <td colspan="4">No hay salones registrados.</td>
+                        <td colspan="4">No hay aulas registradas.</td>
                     </tr>
                     }
                 </tbody>
@@ -289,7 +288,7 @@
                         </td>
                         <td>--</td>
                         <td class="acciones-salon">
-                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <!-- se reutilizan los estilos de los botones de aulas -->
                             <button type="button" class="boton-editar-salon"
                                 (click)="abrirFormularioEquipoEditar(equipo)">Editar</button>
                             <button type="button" class="boton-eliminar-salon"
@@ -349,7 +348,7 @@
                                 estadoDirector(director) }}</span>
                         </td>
                         <td class="acciones-salon">
-                            <!-- se reutilizan los estilos de los botones de salones -->
+                            <!-- se reutilizan los estilos de los botones de aulas -->
                             <button type="button" class="boton-editar-salon"
                                 (click)="abrirFormularioDirector(director)">Editar</button>
                             <button type="button" class="boton-eliminar-salon"
@@ -476,7 +475,7 @@
             </div>
             <p class="texto-detalle">{{ nombrePrograma(reserva.programa_id) }}</p>
             <p class="texto-detalle texto-detalle-suave">
-                Salón {{ nombreSalon(reserva.salon_id) }} · {{ textoReserva(reserva) }} · {{ reserva.hora_inicio }}:00 a
+                Aula {{ nombreSalon(reserva.salon_id) }} · {{ textoReserva(reserva) }} · {{ reserva.hora_inicio }}:00 a
                 {{ reserva.hora_fin }}:00
             </p>
             @if (correoDirector(reserva.director_id)) {
@@ -505,11 +504,11 @@
     </div>
     }
 
-    <!-- formulario de salón: nuevo / editar -->
+    <!-- formulario de aula: nueva / editar -->
     @if (formularioSalonAbierto(); as abiertoSalon) {
     <div class="fondo-ventana" (click)="cerrarFormularioSalon()">
         <section class="ventana-formulario" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-            <h3 class="titulo-ventana">{{ abiertoSalon.modo === 'crear' ? 'Nuevo salón' : 'Editar salón' }}</h3>
+            <h3 class="titulo-ventana">{{ abiertoSalon.modo === 'crear' ? 'Nueva aula' : 'Editar aula' }}</h3>
 
             <div class="campos-formulario" [formGroup]="formularioSalon">
                 <label class="etiqueta-formulario" for="nombre-salon">Nombre</label>
@@ -524,7 +523,7 @@
 
                 <label class="etiqueta-formulario" for="dotacion-salon">Dotación</label>
                 <input id="dotacion-salon" class="campo-formulario" formControlName="dotacion" placeholder="TV, Py">
-                <p class="ayuda-formulario">Sepárala con comas. Déjala vacía si el salón no tiene dotación (NG).</p>
+                <p class="ayuda-formulario">Sepárala con comas. Déjala vacía si el aula no tiene dotación (NG).</p>
             </div>
 
             @if (advertenciaSalon()) {
@@ -541,12 +540,12 @@
     </div>
     }
 
-    <!-- confirmar eliminar salón -->
+    <!-- confirmar eliminar aula -->
     @if (salonAEliminar(); as salon) {
     <div class="fondo-ventana" (click)="salonAEliminar.set(null)">
         <section class="ventana-detalle" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
             <h3 class="titulo-detalle">Confirmar acción</h3>
-            <p class="texto-detalle">¿Eliminar el salón {{ salon.nombre || '--' }}?</p>
+            <p class="texto-detalle">¿Eliminar el aula {{ salon.nombre || '--' }}?</p>
             <div class="botones-ventana">
                 <button type="button" class="boton-cancelar" (click)="salonAEliminar.set(null)">Cancelar</button>
                 <button type="button" class="boton-confirmar" [disabled]="guardando()"
